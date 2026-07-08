@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TI Lead Generation Dashboard — June 2026</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root{
+    --dark-blue:#003b71; --light-blue:#139dd8; --light-blue2:#4199d8;
+    --teal:#3bbfb5; --lime:#99cc33; --magenta:#ec388a; --cream:#e7e3da; --lbgray:#e0e8f5;
+    --ink:#1c2a3a; --muted:#64748b; --card-bg:#ffffff; --page-bg:#f4f6fa; --border:#e2e8f0;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; font-family:Arial, Helvetica, sans-serif; background:var(--page-bg); color:var(--ink);}
+  header{background:linear-gradient(120deg, var(--dark-blue) 0%, #0a5a9c 100%); color:#fff; padding:32px 40px 26px;}
+  header h1{margin:0 0 6px; font-size:26px; font-weight:800; letter-spacing:.2px;}
+  header p{margin:0; font-size:14px; color:#cfe3f5;}
+  .badge-row{display:flex; gap:10px; margin-top:14px; flex-wrap:wrap;}
+  .badge{background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.25); padding:5px 12px; border-radius:20px; font-size:12px; color:#fff;}
+  .badge.down{background:rgba(236,56,138,.25); border-color:rgba(236,56,138,.5);}
+  main{padding:26px 40px 60px; max-width:1440px; margin:0 auto;}
+
+  .kpi-grid{display:grid; grid-template-columns:repeat(5,1fr); gap:14px; margin-bottom:26px;}
+  .kpi{background:var(--card-bg); border:1px solid var(--border); border-radius:12px; padding:18px; position:relative; overflow:hidden;}
+  .kpi::before{content:""; position:absolute; left:0; top:0; bottom:0; width:4px;}
+  .kpi.c1::before{background:var(--dark-blue);} .kpi.c2::before{background:var(--light-blue);}
+  .kpi.c3::before{background:var(--teal);} .kpi.c4::before{background:var(--lime);} .kpi.c5::before{background:var(--magenta);}
+  .kpi .label{font-size:11px; color:var(--muted); font-weight:700; text-transform:uppercase; letter-spacing:.4px;}
+  .kpi .value{font-size:30px; font-weight:800; margin-top:6px; color:var(--dark-blue);}
+  .kpi .sub{font-size:11.5px; color:var(--muted); margin-top:4px;}
+  .chip{display:inline-block; font-size:10.5px; font-weight:700; padding:2px 8px; border-radius:10px; margin-top:6px;}
+  .chip.good{background:#e9f7ef; color:#1e7a45;}
+  .chip.bad{background:#fdeef4; color:#b02a63;}
+  .chip.flat{background:var(--lbgray); color:var(--muted);}
+
+  .section-title{font-size:16px; font-weight:800; color:var(--dark-blue); margin:34px 0 4px;}
+  .section-sub{font-size:12.5px; color:var(--muted); margin-bottom:16px; line-height:1.5;}
+  .section-sub b{color:var(--ink);}
+
+  .funnel-wrap{background:var(--card-bg); border:1px solid var(--border); border-radius:14px; padding:26px 30px; display:flex; gap:34px; align-items:center; flex-wrap:wrap;}
+  .funnel-stages{display:flex; flex-direction:column; gap:10px; flex:1; min-width:320px;}
+  .fstage .bar{height:46px; border-radius:8px; display:flex; align-items:center; padding:0 18px; color:#fff; font-weight:700; font-size:14px; justify-content:space-between;}
+  .fstage .meta{font-size:11.5px; color:var(--muted); margin-top:4px; padding-left:2px;}
+  .funnel-side{flex:1; min-width:280px;}
+  .split-row{display:flex; align-items:center; gap:10px; margin-bottom:10px;}
+  .split-row .dot{width:11px; height:11px; border-radius:3px; flex-shrink:0;}
+  .split-row .txt{font-size:13px; flex:1;}
+  .split-row .num{font-weight:800; font-size:14px;}
+  .divider{height:1px; background:var(--border); margin:14px 0;}
+
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:18px;}
+  .grid2x2{display:grid; grid-template-columns:1fr 1fr; gap:18px;}
+  .card{background:var(--card-bg); border:1px solid var(--border); border-radius:14px; padding:20px 22px 12px;}
+  .card h3{margin:0 0 2px; font-size:14.5px; color:var(--dark-blue); font-weight:800;}
+  .card .desc{font-size:12px; color:var(--muted); margin-bottom:12px;}
+  .chart-box{position:relative; height:280px;}
+  .chart-box.tall{height:340px;}
+  .full{grid-column:1/-1;}
+
+  .callout{background:#fff7fb; border:1px solid #f6d3e6; border-radius:12px; padding:16px 20px; font-size:13px; color:#5a2540; margin-top:16px; line-height:1.5;}
+  .callout b{color:var(--magenta);}
+  .caveat{background:#fff8e8; border:1px solid #f2dfa8; border-radius:12px; padding:16px 20px; font-size:13px; color:#6b5320; margin-top:16px; line-height:1.5;}
+  .caveat b{color:#a9781a;}
+
+  .data-table{width:100%; border-collapse:collapse; font-size:13px;}
+  .data-table th{text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:.3px; color:var(--muted); font-weight:700; padding:10px 12px; border-bottom:2px solid var(--border);}
+  .data-table td{padding:11px 12px; border-bottom:1px solid var(--border);}
+  .data-table td.num, .data-table th.num{text-align:right; font-variant-numeric:tabular-nums;}
+  .data-table tr:last-child td{font-weight:800; background:var(--lbgray);}
+  .data-table.no-total tr:last-child td{font-weight:400; background:transparent;}
+  .data-table.no-total tr:last-child:hover td{background:#fafbfd;}
+  .data-table tr:hover td{background:#fafbfd;}
+  .data-table tr:last-child:hover td{background:var(--lbgray);}
+
+  footer{padding:20px 40px 40px; text-align:center; color:var(--muted); font-size:11.5px;}
+  @media(max-width:1100px){ .kpi-grid{grid-template-columns:repeat(2,1fr);} .grid2, .grid2x2{grid-template-columns:1fr;} }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>TI Lead Generation Dashboard — June 2026</h1>
+  <p>Leads first seen in June 2026 · spam/test/internal removed · channel &amp; funnel per TI methodology</p>
+  <div class="badge-row">
+    <div class="badge"><strong>29</strong> new unique leads · 35 total submissions</div>
+    <div class="badge down" id="momBadge">–</div>
+  </div>
+</header>
+
+<main>
+
+  <!-- 2. KPI ROW (5 cards) -->
+  <div class="kpi-grid">
+    <div class="kpi c1"><div class="label">New Unique Leads</div><div class="value">29</div><div class="sub">35 total submissions</div><span class="chip bad">&#9660; 10 vs May (39)</span></div>
+    <div class="kpi c2"><div class="label">MQL</div><div class="value">7</div><div class="sub">24.1% of June leads</div><span class="chip bad">&#9660; 2 vs May (9)</span></div>
+    <div class="kpi c3"><div class="label">SQL Total</div><div class="value">22</div><div class="sub">75.9% of June leads</div><span class="chip bad">&#9660; 8 vs May (30)</span></div>
+    <div class="kpi c4"><div class="label">SQL via Contact Form</div><div class="value">20</div><div class="sub">Auto-100 on demo submit</div><span class="chip bad">&#9660; 8 vs May (28)</span></div>
+    <div class="kpi c5"><div class="label">SQL via Engagement Score</div><div class="value">2</div><div class="sub">Score ≥100, no form fill</div><span class="chip flat">&#8212; flat vs May (2)</span></div>
+  </div>
+
+  <!-- 3. FORM FILL BREAKDOWN -->
+  <div class="section-title">June Form Fill Breakdown</div>
+  <div class="section-sub">Unique people by form type, after removing spam/test/internal entries and deduping repeat submitters.</div>
+  <div class="card full" style="padding:8px 22px 4px;">
+    <table class="data-table">
+      <thead><tr><th>Form Type</th><th class="num">May</th><th class="num">June</th><th class="num">MoM</th></tr></thead>
+      <tbody id="formBody"></tbody>
+    </table>
+  </div>
+  <div class="callout" id="formNote"></div>
+
+  <!-- 4. SERVICE LINE -->
+  <div class="section-title">June Form Fills by Service Line</div>
+  <div class="section-sub">Transcribed from TI's service-line segmentation. <b>Summits</b> is a separate event/registration line outside the demo-form funnel — it reads zero this month and is kept flagged rather than blended in.</div>
+  <div class="grid2">
+    <div class="card"><h3>Sales Form Fills by Service Line</h3><div class="desc">June · demo-request forms · 24 total <span class="chip bad">&#9660; 6 vs May (30)</span></div><div class="chart-box"><canvas id="salesSvc"></canvas></div></div>
+    <div class="card"><h3>Resource Form Fills by Service Line</h3><div class="desc">June · leadership webform · 9 total <span class="chip good">&#9650; 2 vs May (7)</span></div><div class="chart-box"><canvas id="resSvc"></canvas></div></div>
+  </div>
+  <div class="caveat"><b>Summits caveat &amp; sanity check:</b> Summits = 0 this month (TI has no active Summits leads). Sales-side total excl. Summits (24) vs. June combined demo-contact unique (22) — consistent; the small gap is from repeat/overlap submitters, confirming Summits as a distinct source. <b>MoM note:</b> May service-line totals (Sales 30, Resource 7) are transcribed from the YTD screenshot's May column — please verify: Sales May = TI General 2, eClinical 10, TMF 3, CTMS 1, Other 14; Resource May = TI General 3, TMF 1, eTMF 1, AI/ML 2.</div>
+
+  <!-- 5. FUNNEL -->
+  <div class="section-title">June Funnel: New Leads → MQL → SQL</div>
+  <div class="section-sub">Based on the 29 unique people whose first-ever touch happened in June.</div>
+  <div class="funnel-wrap">
+    <div class="funnel-stages" id="funnelStages"></div>
+    <div class="funnel-side">
+      <div style="font-size:13px;font-weight:800;color:var(--dark-blue);margin-bottom:12px;">How June leads reached SQL status</div>
+      <div class="split-row"><div class="dot" style="background:var(--lime)"></div><div class="txt">Contact Form Fill (deterministic, instant)</div><div class="num">20</div></div>
+      <div class="split-row"><div class="dot" style="background:var(--magenta)"></div><div class="txt">Score-Qualified (score ≥100, no form fill)</div><div class="num">2</div></div>
+      <div class="divider"></div>
+      <div class="split-row"><div class="dot" style="background:var(--dark-blue)"></div><div class="txt">SQL Total</div><div class="num">22</div></div>
+      <div class="divider"></div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.7;"><b>vs May cohort:</b> New <span class="chip bad">&#9660; 10 vs May (39)</span> · MQL <span class="chip bad">&#9660; 2 vs May (9)</span> · SQL <span class="chip bad">&#9660; 8 vs May (30)</span></div>
+    </div>
+  </div>
+
+  <!-- 6. ENGAGEMENT -> CONTACT FORM -->
+  <div class="section-title">Which Engagement Types Lead to a Contact Form? (June cohort)</div>
+  <div class="section-sub">Of June's non-demo-origin leads (resource downloads, LinkedIn ad leads, nurture touches), how many later filled a demo-request form anywhere in the dataset? <b>MoM:</b> June has 9 non-demo-origin leads vs 11 in May; neither cohort has converted any to a demo form yet.</div>
+  <div class="funnel-wrap" style="align-items:stretch;">
+    <div style="flex:1; min-width:220px; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; border-right:1px solid var(--border); padding-right:24px;">
+      <div style="font-size:44px; font-weight:800; color:var(--magenta);">0</div>
+      <div style="font-size:13px; color:var(--muted); margin-top:4px;">out of 9 June non-demo-origin leads later filled a contact form</div>
+    </div>
+    <div class="funnel-side" style="flex:2;">
+      <div class="split-row"><div class="dot" style="background:var(--lime)"></div><div class="txt">Started via Gated Resource (leadership) download</div><div class="num">0 of 8</div></div>
+      <div class="split-row"><div class="dot" style="background:var(--light-blue2)"></div><div class="txt">Started via LinkedIn (Paid Social) ad lead</div><div class="num">0 of 1</div></div>
+      <div class="split-row"><div class="dot" style="background:var(--teal)"></div><div class="txt">Ever had an Email-Nurture-attributed touch</div><div class="num">0 of 1</div></div>
+      <div class="divider"></div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.5;">None of June's non-demo-origin leads had progressed to a demo-request form within the available data. June's SQLs are driven overwhelmingly by direct contact-form fills rather than upstream engagement conversion — worth revisiting this cohort in July/August once they've had more time to re-engage.</div>
+    </div>
+  </div>
+
+  <!-- 7. CHANNEL PERFORMANCE -->
+  <div class="section-title">Channel Performance — June</div>
+  <div class="section-sub">Lead share and trailing 6-month trends (new-lead cohort, first-touch channel). Trend reflects full Jan–Jun history; June is the lowest new-lead month in the window.<br><span id="chanMomChips"></span></div>
+  <div class="grid2x2">
+    <div class="card"><h3>Lead Share by Channel</h3><div class="desc">% of June new leads</div><div class="chart-box"><canvas id="donut"></canvas></div></div>
+    <div class="card"><h3>Total New Leads — June in Context</h3><div class="desc">Jan–Jun, June highlighted</div><div class="chart-box"><canvas id="trendTotal"></canvas></div></div>
+    <div class="card"><h3>Google Ads — June in Context</h3><div class="desc">Jan–Jun, June highlighted</div><div class="chart-box"><canvas id="trendGads"></canvas></div></div>
+    <div class="card"><h3>LinkedIn (Paid Social) — June in Context</h3><div class="desc">Jan–Jun, June highlighted</div><div class="chart-box"><canvas id="trendLi"></canvas></div></div>
+  </div>
+
+  <!-- 8. CHANNELS DROVE SQLs -->
+  <div class="section-title">Which Channels Drove June's SQLs?</div>
+  <div class="section-sub">June's new unique leads by first-touch channel, stacked into MQL / SQL–Contact Form / SQL–Score Qualified. Sorted largest total first. <b>MoM:</b> SQL total <span class="chip bad">&#9660; 8 vs May (30)</span> — contact-form SQLs <span class="chip bad">&#9660; 8 vs May (28)</span>, score-qualified <span class="chip flat">&#8212; flat vs May (2)</span>.</div>
+  <div class="card full"><div class="chart-box tall"><canvas id="s8chart"></canvas></div></div>
+  <div class="callout"><b>Read with care:</b> June's SQLs convert almost entirely via contact-form fill, not score. A channel reaching SQL purely through Pardot score with no form fill would suggest manual "sales-ready" score adjustment — in June no paid channel shows that profile; the only score-only SQLs are Direct/Organic (2).</div>
+
+  <!-- 9. CHANNELS DROVE MQLs -->
+  <div class="section-title">Which Channels Drove June's MQLs?</div>
+  <div class="section-sub">MQL count by first-touch channel, colored to match each channel's donut color. <b>MoM:</b> MQLs <span class="chip bad">&#9660; 2 vs May (9)</span>.</div>
+  <div class="card full"><div class="chart-box"><canvas id="s9chart"></canvas></div></div>
+
+  <!-- 10. SCORE DISTRIBUTION -->
+  <div class="section-title">Engagement Score Distribution — June</div>
+  <div class="section-sub">Where June's new leads sit on the Pardot score scale (100 = SQL threshold). Blue below 100, magenta at/above. <b>MoM:</b> 20 of 29 June leads (69%) sit at ≥100, vs 29 of 39 (74%) in May.</div>
+  <div class="card full"><div class="chart-box tall"><canvas id="scoreChart"></canvas></div></div>
+
+  <!-- ===== DEEPER INSIGHTS (H1 2026) ===== -->
+  <div class="section-title" style="margin-top:48px; font-size:18px;">Deeper Insights — H1 2026</div>
+  <div class="section-sub">Derived from the full Jan–Jun dataset behind this dashboard. These views place June in context and surface where action is likely to pay off.</div>
+
+  <!-- 11. LEAD QUALITY TREND -->
+  <div class="section-title">Lead Quality Trend: SQL Rate by Monthly Cohort</div>
+  <div class="section-sub">Each month's new-lead cohort and the share that reached SQL. <b>Volume fell 51 → 29 from Jan to Jun, but SQL rate nearly doubled (39% → 76%)</b> — H1's story is fewer-but-better leads, which reframes June's "decline" in the volume trend above.</div>
+  <div class="card full"><div class="chart-box tall"><canvas id="cohortChart"></canvas></div></div>
+
+  <!-- 12. CHANNEL QUALITY SCORECARD -->
+  <div class="section-title">H1 Channel Quality Scorecard</div>
+  <div class="section-sub">All Jan–Jun leads by first-touch channel: volume, SQL conversion, and average max Pardot score.</div>
+  <div class="card full" style="padding:8px 22px 4px;">
+    <table class="data-table">
+      <thead><tr><th>Channel</th><th class="num">Leads (H1)</th><th class="num">SQL</th><th class="num">SQL Rate</th><th class="num">Avg Max Score</th></tr></thead>
+      <tbody id="cqBody"></tbody>
+    </table>
+  </div>
+  <div class="callout"><b>The budget question this raises:</b> Google Ads converts <b>89%</b> of its leads to SQL (17 of 19, avg score 107) while LinkedIn (Paid Social) converts <b>8%</b> (5 of 61, avg score 56 — the lowest of any channel). If spend is comparable across the two, this is the single highest-impact reallocation candidate in the data. LinkedIn's value case would need to rest on audience/brand goals rather than pipeline.</div>
+
+  <!-- 13. LIFETIME ENGAGEMENT CONVERSION -->
+  <div class="section-title">Do Gated Content &amp; LinkedIn Ads Ever Convert? (full-history view)</div>
+  <div class="section-sub">June's cohort showed 0 conversions to a demo form — but that could just mean the cohort is young. This view asks the same question across the <b>full available history (Dec 2025 – Jun 2026</b>; the LinkedIn Paid Social export reaches back to Dec 2025, so 10 of the 71 LinkedIn-origin leads pre-date H1<b>)</b>.</div>
+  <div class="funnel-wrap" style="align-items:stretch;">
+    <div style="flex:1; min-width:260px;" id="lifetimeRows"></div>
+    <div class="funnel-side" style="flex:1.4;">
+      <div style="font-size:13px;font-weight:800;color:var(--dark-blue);margin-bottom:10px;">The 3 resource-origin leads that did convert</div>
+      <div id="convExamples" style="font-size:12.5px; line-height:1.7; color:var(--ink);"></div>
+      <div class="divider"></div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.5;">Conversion lag ranged from same-day to 132 days — when gated content does convert, it can take a full quarter. But the base rate is the headline: <b>gated downloads convert to demo requests ~4% of the time, and LinkedIn ad leads have never converted</b> in the available history (Dec 2025 – Jun 2026). This is structural, not a young-cohort artifact.</div>
+    </div>
+  </div>
+
+  <!-- 14. WARM PIPELINE -->
+  <div class="section-title">Warm Pipeline: High-Score MQLs With No Form Fill</div>
+  <div class="section-sub">Leads scoring 50–99 — engaged enough to be near the SQL threshold, but who never raised a hand. <b><span id="warmTotal"></span> such leads exist in H1</b>; the ten highest-scoring are below. This is a ready-made list for targeted nurture or SDR outreach.</div>
+  <div class="card full" style="padding:8px 22px 4px;">
+    <table class="data-table no-total">
+      <thead><tr><th>Lead</th><th class="num">Score</th><th>First Touch</th><th>First-Touch Channel</th></tr></thead>
+      <tbody id="warmBody"></tbody>
+    </table>
+  </div>
+
+  <!-- 15. PRODUCT INSIGHTS -->
+  <div class="section-title" style="margin-top:48px; font-size:18px;">Product Insights — Content &amp; Page Attribution</div>
+  <div class="section-sub"><b>Data limitations, stated up front:</b> (1) <b>YoY is not available</b> — the dataset begins Dec 2025/Jan 2026, so there is no prior-year June to compare against; comparisons here are MoM only. (2) Page-view journeys are not tracked, so "the page a lead visited immediately before converting" cannot be determined; the closest available signal is each converter's <b>first-touch landing page</b>, shown below.</div>
+  <div class="grid2">
+    <div class="card">
+      <h3>First-Touch Page of SQL Converters</h3>
+      <div class="desc">Landing page of each contact-form SQL's first-ever touch · May vs June cohorts + YTD (Jan–Jun) · top 15 by YTD</div>
+      <table class="data-table no-total" style="font-size:12px;">
+        <thead><tr><th>Page</th><th class="num">May</th><th class="num">June</th><th class="num">YTD</th></tr></thead>
+        <tbody id="sqlPagesBody"></tbody>
+      </table>
+    </div>
+    <div class="card">
+      <h3>Gated Content Assets — Downloads &amp; Current Stage</h3>
+      <div class="desc">Unique downloaders per asset (leadership webform) · May vs June + YTD (Jan–Jun) · (x/y) = downloaders now MQL / now SQL · top 15 by YTD</div>
+      <table class="data-table no-total" style="font-size:12px;">
+        <thead><tr><th>Asset</th><th class="num">May (MQL/SQL)</th><th class="num">June (MQL/SQL)</th><th class="num">YTD (MQL/SQL)</th></tr></thead>
+        <tbody id="assetsBody"></tbody>
+      </table>
+    </div>
+  </div>
+  <div class="callout"><b>What shifted MoM:</b> <span id="productCallout"></span></div>
+
+</main>
+
+<footer>TI Marketing — June 2026 Lead Generation Snapshot · Chart.js 4.4.1 · scoped to leads first seen in June</footer>
+
+<script>
+const D = {"insights": {"cohort_eff": [{"m": "Jan", "new": 51, "sql": 20, "rate": 39.2}, {"m": "Feb", "new": 44, "sql": 25, "rate": 56.8}, {"m": "Mar", "new": 36, "sql": 15, "rate": 41.7}, {"m": "Apr", "new": 42, "sql": 21, "rate": 50.0}, {"m": "May", "new": 39, "sql": 30, "rate": 76.9}, {"m": "Jun", "new": 29, "sql": 22, "rate": 75.9}], "channel_quality": [{"channel": "Direct / Organic (No UTM)", "leads": 146, "sql": 101, "rate": 69, "avg_score": 140}, {"channel": "LinkedIn (Paid Social)", "leads": 61, "sql": 5, "rate": 8, "avg_score": 56}, {"channel": "Google Ads (Paid Search)", "leads": 19, "sql": 17, "rate": 89, "avg_score": 107}, {"channel": "Email Nurture (Pardot/Act-On)", "leads": 9, "sql": 5, "rate": 56, "avg_score": 249}, {"channel": "AI Referral (ChatGPT)", "leads": 6, "sql": 5, "rate": 83, "avg_score": 112}], "lifetime": {"res_total": 73, "res_conv": 3, "li_total": 71, "li_conv": 0, "nur_total": 5, "nur_conv": 0, "examples": [{"email": "rb@ghres.com", "first": "2026-03-02", "contact": "2026-03-18", "days": 16}, {"email": "bella.chen@adlainortye.com", "first": "2026-04-09", "contact": "2026-04-09", "days": 0}, {"email": "vgv@lilly.com", "first": "2026-01-14", "contact": "2026-05-27", "days": 132}]}, "warm": {"total": 54, "top": [{"email": "jessica.bache.hansen@vicorepharma.com", "score": 98, "first": "2026-05-18", "channel": "Direct / Organic (No UTM)"}, {"email": "adiaz@alnylam.com", "score": 94, "first": "2025-12-15", "channel": "LinkedIn (Paid Social)"}, {"email": "susana.schmitz@uni-rostock.de", "score": 91, "first": "2026-03-06", "channel": "Google Ads (Paid Search)"}, {"email": "sevgin.gunes@occlutech.com", "score": 89, "first": "2026-02-09", "channel": "Email Nurture (Pardot/Act-On)"}, {"email": "liz.okeke@teleflex.com", "score": 88, "first": "2026-03-26", "channel": "LinkedIn (Paid Social)"}, {"email": "gmatias@vectorb2b.com", "score": 82, "first": "2026-04-08", "channel": "Direct / Organic (No UTM)"}, {"email": "nmalpartida@tech-res.com", "score": 80, "first": "2026-01-20", "channel": "Email Nurture (Pardot/Act-On)"}, {"email": "j.oh@medpace.com", "score": 76, "first": "2026-06-26", "channel": "Direct / Organic (No UTM)"}, {"email": "liujuan@juventas.cn", "score": 75, "first": "2026-06-26", "channel": "Direct / Organic (No UTM)"}, {"email": "teresa.reisig@arthrex.com", "score": 75, "first": "2025-12-15", "channel": "LinkedIn (Paid Social)"}]}}, "product": {"sql_pages": [{"page": "/contact", "may": 14, "jun": 1, "ytd": 26}, {"page": "/ (homepage)", "may": 3, "jun": 5, "ytd": 23}, {"page": "(none recorded)", "may": 0, "jun": 0, "ytd": 11}, {"page": "/etmf-tmf-solutions", "may": 0, "jun": 5, "ytd": 7}, {"page": "/etmf-tmf-solutions/etmf", "may": 0, "jun": 3, "ytd": 6}, {"page": "/CTMS", "may": 4, "jun": 1, "ytd": 6}, {"page": "/optimize-tmf-roadshow-2026", "may": 0, "jun": 0, "ytd": 5}, {"page": "/request-a-demo", "may": 1, "jun": 0, "ytd": 3}, {"page": "/eCTD-Submission-Solution", "may": 1, "jun": 1, "ytd": 2}, {"page": "/eISF", "may": 0, "jun": 1, "ytd": 2}, {"page": "/eArchive", "may": 1, "jun": 0, "ytd": 2}, {"page": "/eClinical-platform-overview", "may": 1, "jun": 0, "ytd": 2}, {"page": "/eclinical-platform", "may": 0, "jun": 0, "ytd": 2}, {"page": "/blog/ctms-integration", "may": 0, "jun": 1, "ytd": 1}, {"page": "/optimize-2026", "may": 0, "jun": 1, "ytd": 1}, {"page": "/blog/what-your-monitoring-reports-are-already-telling-you-and-why-no-one-listening", "may": 0, "jun": 1, "ytd": 1}, {"page": "/investigator-meetings", "may": 1, "jun": 0, "ytd": 1}, {"page": "/etmf-migration", "may": 1, "jun": 0, "ytd": 1}, {"page": "/elearning-service", "may": 1, "jun": 0, "ytd": 1}, {"page": "/service-desk", "may": 0, "jun": 0, "ytd": 1}, {"page": "/investigator-database", "may": 0, "jun": 0, "ytd": 1}, {"page": "/thought-leadership/surfacing-your-ctms-and-etmf-using-ai/950", "may": 0, "jun": 0, "ytd": 1}, {"page": "/etmf-tmf-solutions/tmf-services", "may": 0, "jun": 0, "ytd": 1}, {"page": "/event/optimize-tmf-roadshow-barcelona", "may": 0, "jun": 0, "ytd": 1}, {"page": "/access/ultimate-tmf-resource-pack", "may": 0, "jun": 0, "ytd": 1}, {"page": "/leadership", "may": 0, "jun": 0, "ytd": 1}], "assets": [{"asset": "ich-e6r3-tmf-oversight-best-practices-ensuring-compliance-and-quality", "may": {"n": 1, "mql": 1, "sql": 0}, "jun": {"n": 0, "mql": 0, "sql": 0}, "ytd": {"n": 9, "mql": 6, "sql": 3}}, {"asset": "understanding-risk-based-capa", "may": {"n": 0, "mql": 0, "sql": 0}, "jun": {"n": 0, "mql": 0, "sql": 0}, "ytd": {"n": 8, "mql": 6, "sql": 2}}, {"asset": "surfacing-your-ctms-and-etmf-using-ai", "may": {"n": 0, "mql": 0, "sql": 0}, "jun": {"n": 0, "mql": 0, "sql": 0}, "ytd": {"n": 7, "mql": 3, "sql": 4}}, {"asset": "mhra-inspection-insights-part-2-metrics-matter", "may": {"n": 0, "mql": 0, "sql": 0}, "jun": {"n": 0, "mql": 0, "sql": 0}, "ytd": {"n": 6, "mql": 5, "sql": 1}}, {"asset": "data-interoperability-enablement-adopting-end-end-clinical-systems-apa", "may": {"n": 0, "mql": 0, "sql": 0}, "jun": {"n": 5, "mql": 3, "sql": 2}, "ytd": {"n": 5, "mql": 3, "sql": 2}}, {"asset": "ai-clinical-operations-where-it-actually-saves-30-60-days-and-where-it", "may": {"n": 2, "mql": 1, "sql": 1}, "jun": {"n": 2, "mql": 2, "sql": 0}, "ytd": {"n": 4, "mql": 3, "sql": 1}}, {"asset": "tmf-rescue-checklist-gap-analysis-and-remediate-strategies", "may": {"n": 0, "mql": 0, "sql": 0}, "jun": {"n": 0, "mql": 0, "sql": 0}, "ytd": {"n": 4, "mql": 4, "sql": 0}}, {"asset": "beyond-surface-level-ai-deep-inspection-etmf-records-quality-complianc", "may": {"n": 0, "mql": 0, "sql": 0}, "jun": {"n": 0, "mql": 0, "sql": 0}, "ytd": {"n": 4, "mql": 0, "sql": 4}}, {"asset": "etmf-implementation-checklist", "may": {"n": 1, "mql": 1, "sql": 0}, "jun": {"n": 0, "mql": 0, "sql": 0}, "ytd": {"n": 3, "mql": 3, "sql": 0}}, {"asset": "etmf-migration-download", "may": {"n": 0, "mql": 0, "sql": 0}, "jun": {"n": 0, "mql": 0, "sql": 0}, "ytd": {"n": 3, "mql": 2, "sql": 1}}, {"asset": "20250721_tmfmockinspection_internal_quality_review_checklist_v1.01.pdf", "may": {"n": 0, "mql": 0, "sql": 0}, "jun": {"n": 0, "mql": 0, "sql": 0}, "ytd": {"n": 3, "mql": 3, "sql": 0}}, {"asset": "tmf-health-quick-guide", "may": {"n": 2, "mql": 1, "sql": 1}, "jun": {"n": 0, "mql": 0, "sql": 0}, "ytd": {"n": 2, "mql": 1, "sql": 1}}, {"asset": "ich-e6r3-and-mhra-guidance-what-it-means-tmf", "may": {"n": 2, "mql": 0, "sql": 2}, "jun": {"n": 0, "mql": 0, "sql": 0}, "ytd": {"n": 2, "mql": 0, "sql": 2}}, {"asset": "key-takeaways-from-optimize-london", "may": {"n": 0, "mql": 0, "sql": 0}, "jun": {"n": 0, "mql": 0, "sql": 0}, "ytd": {"n": 2, "mql": 0, "sql": 2}}, {"asset": "tmf-mock-inspection-and-internal-quality-review-checklist", "may": {"n": 0, "mql": 0, "sql": 0}, "jun": {"n": 0, "mql": 0, "sql": 0}, "ytd": {"n": 2, "mql": 0, "sql": 2}}, {"asset": "mhra-inspection-insights", "may": {"n": 0, "mql": 0, "sql": 0}, "jun": {"n": 0, "mql": 0, "sql": 0}, "ytd": {"n": 2, "mql": 1, "sql": 1}}, {"asset": "de-los-informes-de-monitorizacion-la-preparacion-para-inspecciones-com", "may": {"n": 0, "mql": 0, "sql": 0}, "jun": {"n": 1, "mql": 0, "sql": 1}, "ytd": {"n": 1, "mql": 0, "sql": 1}}, {"asset": "three-pillars-of-quality-management", "may": {"n": 0, "mql": 0, "sql": 0}, "jun": {"n": 1, "mql": 1, "sql": 0}, "ytd": {"n": 1, "mql": 1, "sql": 0}}, {"asset": "cdisc-tmf-europe-interchange-key-takeaways-and-insights", "may": {"n": 1, "mql": 1, "sql": 0}, "jun": {"n": 0, "mql": 0, "sql": 0}, "ytd": {"n": 1, "mql": 1, "sql": 0}}, {"asset": "no-file-left-behind", "may": {"n": 1, "mql": 1, "sql": 0}, "jun": {"n": 0, "mql": 0, "sql": 0}, "ytd": {"n": 1, "mql": 1, "sql": 0}}, {"asset": "can-ai-help-alleviate-challenges-with-clinical-site-selection", "may": {"n": 0, "mql": 0, "sql": 0}, "jun": {"n": 0, "mql": 0, "sql": 0}, "ytd": {"n": 1, "mql": 1, "sql": 0}}, {"asset": "trial-interactive-it-fact-sheet", "may": {"n": 0, "mql": 0, "sql": 0}, "jun": {"n": 0, "mql": 0, "sql": 0}, "ytd": {"n": 1, "mql": 1, "sql": 0}}, {"asset": "lunch-and-learn", "may": {"n": 0, "mql": 0, "sql": 0}, "jun": {"n": 0, "mql": 0, "sql": 0}, "ytd": {"n": 1, "mql": 1, "sql": 0}}, {"asset": "seamless-tmf-operations-best-practices-for-efficiency-and-long-term-su", "may": {"n": 0, "mql": 0, "sql": 0}, "jun": {"n": 0, "mql": 0, "sql": 0}, "ytd": {"n": 1, "mql": 0, "sql": 1}}, {"asset": "top-7-oversight-pitfalls-sponsors-must-avoid", "may": {"n": 0, "mql": 0, "sql": 0}, "jun": {"n": 0, "mql": 0, "sql": 0}, "ytd": {"n": 1, "mql": 0, "sql": 1}}, {"asset": "audit-proof-automation", "may": {"n": 0, "mql": 0, "sql": 0}, "jun": {"n": 0, "mql": 0, "sql": 0}, "ytd": {"n": 1, "mql": 1, "sql": 0}}, {"asset": "essential-checklist-for-etmf-archiving", "may": {"n": 0, "mql": 0, "sql": 0}, "jun": {"n": 0, "mql": 0, "sql": 0}, "ytd": {"n": 1, "mql": 1, "sql": 0}}, {"asset": "960", "may": {"n": 0, "mql": 0, "sql": 0}, "jun": {"n": 0, "mql": 0, "sql": 0}, "ytd": {"n": 1, "mql": 0, "sql": 1}}, {"asset": "ask-expert-tmf-series-risk-proportionate-oversight-works", "may": {"n": 0, "mql": 0, "sql": 0}, "jun": {"n": 0, "mql": 0, "sql": 0}, "ytd": {"n": 1, "mql": 1, "sql": 0}}, {"asset": "ctms-implementation-checklist-download", "may": {"n": 0, "mql": 0, "sql": 0}, "jun": {"n": 0, "mql": 0, "sql": 0}, "ytd": {"n": 1, "mql": 1, "sql": 0}}, {"asset": "1010", "may": {"n": 0, "mql": 0, "sql": 0}, "jun": {"n": 0, "mql": 0, "sql": 0}, "ytd": {"n": 1, "mql": 1, "sql": 0}}, {"asset": "(no asset link)", "may": {"n": 0, "mql": 0, "sql": 0}, "jun": {"n": 0, "mql": 0, "sql": 0}, "ytd": {"n": 1, "mql": 0, "sql": 1}}, {"asset": "a-guide-for-best-practices-with-sponsor-oversight", "may": {"n": 0, "mql": 0, "sql": 0}, "jun": {"n": 0, "mql": 0, "sql": 0}, "ytd": {"n": 1, "mql": 1, "sql": 0}}, {"asset": "ask-expert-tmf-series-oversight-101-day-one-confidence", "may": {"n": 0, "mql": 0, "sql": 0}, "jun": {"n": 0, "mql": 0, "sql": 0}, "ytd": {"n": 1, "mql": 1, "sql": 0}}]}, "kpi": {"new_unique": 29, "total_submissions": 35, "mql": 7, "sql_total": 22, "sql_cf": 20, "sql_sq": 2}, "funnel": {"new": 29, "mql": 7, "sql": 22, "sql_cf": 20, "sql_sq": 2}, "eng": {"res_conv": 0, "res_total": 8, "li_conv": 0, "li_total": 1, "nurture_conv": 0, "nurture_total": 1, "headline_conv": 0, "headline_total": 9}, "form_breakdown": [{"form": "Contact Form (demo request \u2014 combined)", "n": 22, "may": 30}, {"form": "Leadership Webform (gated resource)", "n": 9, "may": 9}, {"form": "LinkedIn (Paid Social) Ad Lead Gen Form", "n": 1, "may": 3}], "mom": {"may": {"new": 39, "subs": 43, "mql": 9, "sql": 30, "cf": 28, "sq": 2, "contact": 30, "resource": 9, "social": 3, "form_total": 42, "chan": {"Direct / Organic (No UTM)": 28, "Google Ads (Paid Search)": 6, "Email Nurture (Pardot/Act-On)": 1, "AI Referral (ChatGPT)": 1, "LinkedIn (Paid Social)": 3}, "res_origin": 8, "li_origin": 3, "nondemo_origin": 11, "ge100": 29}, "jun": {"new": 29, "subs": 35, "mql": 7, "sql": 22, "cf": 20, "sq": 2, "contact": 22, "resource": 9, "social": 1, "form_total": 32, "chan": {"Direct / Organic (No UTM)": 23, "AI Referral (ChatGPT)": 2, "Google Ads (Paid Search)": 2, "Email Nurture (Pardot/Act-On)": 1, "LinkedIn (Paid Social)": 1}, "res_origin": 8, "li_origin": 1, "nondemo_origin": 9, "ge100": 20}, "service_may": {"sales": {"TI General": 2, "eClinical / multiple products": 10, "TMF": 3, "CTMS": 1, "Other": 14, "_total": 30}, "resource": {"TI General": 3, "TMF": 1, "eTMF": 1, "AI / ML": 2, "_total": 7}}}, "fb_meta": {"contact": 22, "generic": 13, "dynamic": 10, "contact_overlap": 1, "resource": 9, "social": 1, "total": 32, "repeats": {"carolchiang@gsdermca.com": 2, "gustavo@avant-health.com": 2, "vijay.salokar@corteriapharma.com": 2}, "not_new_count": 3}, "donut": {"labels": ["Direct / Organic (No UTM)", "AI Referral (ChatGPT)", "Google Ads (Paid Search)", "Email Nurture (Pardot/Act-On)", "LinkedIn (Paid Social)"], "values": [23, 2, 2, 1, 1], "colors": ["#003b71", "#99cc33", "#139dd8", "#3bbfb5", "#ec388a"]}, "trend": {"labels": ["Jan", "Feb", "Mar", "Apr", "May", "Jun"], "total": [51, 44, 36, 42, 39, 29], "gads": [4, 1, 4, 2, 6, 2], "li": [19, 15, 15, 8, 3, 1]}, "s8": {"labels": ["Direct / Organic (No UTM)", "AI Referral (ChatGPT)", "Google Ads (Paid Search)", "Email Nurture (Pardot/Act-On)", "LinkedIn (Paid Social)"], "mql": [5, 0, 0, 1, 1], "cf": [16, 2, 2, 0, 0], "sq": [2, 0, 0, 0, 0]}, "s9": {"labels": ["Direct / Organic (No UTM)", "Email Nurture (Pardot/Act-On)", "LinkedIn (Paid Social)"], "values": [5, 1, 1], "colors": ["#003b71", "#3bbfb5", "#ec388a"]}, "score": {"labels": ["No Score", "25-49", "50-74", "75-99", "100-149", "150-199", "200-299", "300-499", "500+"], "values": [2, 1, 4, 2, 12, 1, 7, 0, 0]}, "service": {"sales": {"labels": ["eClinical / multiple products", "eTMF", "CTMS", "eISF", "Other"], "values": [16, 1, 2, 1, 4]}, "resource": {"labels": ["TI General", "eClinical / multiple products", "AI / ML"], "values": [2, 5, 2]}}, "mom_pct": -18.6, "may_subs": 43, "sales_total": 24, "contact_unique": 22};
+const C = {darkBlue:'#003b71',lightBlue:'#139dd8',lightBlue2:'#4199d8',teal:'#3bbfb5',lime:'#99cc33',magenta:'#ec388a',cream:'#e7e3da',lbgray:'#e0e8f5'};
+Chart.defaults.font.family='Arial, Helvetica, sans-serif';
+Chart.defaults.color='#475569';
+Chart.defaults.plugins.legend.labels.boxWidth=12;
+Chart.defaults.plugins.legend.labels.font={size:11};
+
+// MoM badge
+(function(){
+  const m=D.mom_pct, may=D.may_subs, tot=D.kpi.total_submissions, b=document.getElementById('momBadge');
+  if(m===null){ b.textContent='MoM: n/a (no prior-month submissions)'; b.classList.remove('down'); }
+  else { const arrow=m>=0?'\u25b2':'\u25bc'; const sign=m>=0?'+':'';
+    b.textContent=arrow+' '+sign+m+'% total submissions vs May ('+may+' \u2192 '+tot+')';
+    if(m<0) b.classList.add('down'); }
+})();
+
+// Form breakdown table
+(function(){
+  const tb=document.getElementById('formBody'); let tot=0;
+  let totMay=0;
+  const dchip=(cur,prev)=>{const df=cur-prev; if(df===0) return '<span class="chip flat">&#8212; 0</span>';
+    const up=df>0; return `<span class="chip ${up?'good':'bad'}">${up?'&#9650;':'&#9660;'} ${Math.abs(df)}</span>`;};
+  D.form_breakdown.forEach(r=>{ tot+=r.n; totMay+=r.may;
+    const tr=document.createElement('tr'); tr.innerHTML=`<td>${r.form}</td><td class="num">${r.may}</td><td class="num"><b>${r.n}</b></td><td class="num">${dchip(r.n,r.may)}</td>`; tb.appendChild(tr); });
+  const tr=document.createElement('tr'); tr.innerHTML=`<td>TOTAL</td><td class="num">${totMay}</td><td class="num">${tot}</td><td class="num">${dchip(tot,totMay)}</td>`; tb.appendChild(tr);
+  const fbm=D.fb_meta;
+  document.getElementById('formNote').innerHTML=
+    `Contact Form combines the two demo-request forms (generic: <b>${fbm.generic}</b>, dynamic: <b>${fbm.dynamic}</b>). 1 lead filled both demo forms in June (counted once in the combined Contact Form row). 3 lead(s) submitted more than once in June (carolchiang@gsdermca.com, gustavo@avant-health.com, vijay.salokar@corteriapharma.com). 3 June submitter(s) first touched in a prior month, so they're counted in submissions but not in the 29 new-lead cohort.`;
+})();
+
+// Funnel bars
+(function(){
+  const t=D.kpi; const stages=[
+    {label:'New Leads',value:D.funnel.new,color:C.darkBlue},
+    {label:'MQL',value:D.funnel.mql,color:C.lightBlue},
+    {label:'SQL',value:D.funnel.sql,color:C.magenta}];
+  const maxV=stages[0].value, w=document.getElementById('funnelStages');
+  stages.forEach((s,i)=>{ const pct=Math.max(100*s.value/maxV,16);
+    const of=(100*s.value/t.new_unique).toFixed(0);
+    const div=document.createElement('div'); div.className='fstage';
+    div.innerHTML=`<div class="bar" style="width:${pct}%; background:${s.color};"><span>${s.label}</span><span>${s.value}</span></div>
+      <div class="meta">${i===0?'100% of June cohort':of+'% of June leads'}</div>`;
+    w.appendChild(div); });
+})();
+
+// Service line charts
+function svc(id, sl, color){
+  new Chart(document.getElementById(id),{type:'bar',
+    data:{labels:sl.labels,datasets:[{label:'Leads',data:sl.values,backgroundColor:color,borderRadius:5,maxBarThickness:34}]},
+    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
+      scales:{x:{beginAtZero:true,grid:{color:'#eef1f5'},ticks:{precision:0}},y:{grid:{display:false}}},
+      plugins:{legend:{display:false}}}});
+}
+svc('salesSvc', D.service.sales, C.teal);
+svc('resSvc', D.service.resource, C.magenta);
+
+// Donut
+new Chart(document.getElementById('donut'),{type:'doughnut',
+  data:{labels:D.donut.labels,datasets:[{data:D.donut.values,backgroundColor:D.donut.colors,borderWidth:2,borderColor:'#fff'}]},
+  options:{responsive:true,maintainAspectRatio:false,cutout:'62%',
+    plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10.5}}}}}});
+
+// Channel MoM chips
+(function(){
+  const may=D.mom.may.chan, jun=D.mom.jun.chan;
+  const names=[...new Set([...Object.keys(jun),...Object.keys(may)])];
+  const el=document.getElementById('chanMomChips');
+  el.innerHTML = names.map(n=>{
+    const c=jun[n]||0, p=may[n]||0, df=c-p;
+    const cls=df===0?'flat':(df>0?'good':'bad');
+    const sym=df===0?'&#8212;':(df>0?'&#9650;':'&#9660;');
+    return `<span class="chip ${cls}" style="margin-right:6px;">${n.replace(' (No UTM)','').replace(' (Pardot/Act-On)','')}: ${c} ${sym} ${df===0?'':Math.abs(df)} (May ${p})</span>`;
+  }).join('');
+})();
+
+// Trend helper
+function trend(id, series, base){
+  const labels=D.trend.labels;
+  const bg=labels.map((_,i)=> i===labels.length-1 ? C.magenta : C.lbgray);
+  new Chart(document.getElementById(id),{type:'bar',
+    data:{labels,datasets:[{data:series,backgroundColor:bg,borderRadius:5,maxBarThickness:44}]},
+    options:{responsive:true,maintainAspectRatio:false,
+      scales:{y:{beginAtZero:true,grid:{color:'#eef1f5'},ticks:{precision:0}},x:{grid:{display:false}}},
+      plugins:{legend:{display:false}}}});
+}
+trend('trendTotal', D.trend.total);
+trend('trendGads', D.trend.gads);
+trend('trendLi', D.trend.li);
+
+// S8 stacked
+new Chart(document.getElementById('s8chart'),{type:'bar',
+  data:{labels:D.s8.labels,datasets:[
+    {label:'MQL',data:D.s8.mql,backgroundColor:C.lightBlue,stack:'s'},
+    {label:'SQL – Contact Form',data:D.s8.cf,backgroundColor:C.teal,stack:'s'},
+    {label:'SQL – Score Qualified',data:D.s8.sq,backgroundColor:C.magenta,stack:'s'}]},
+  options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
+    scales:{x:{stacked:true,beginAtZero:true,grid:{color:'#eef1f5'},ticks:{precision:0}},y:{stacked:true,grid:{display:false}}},
+    plugins:{legend:{position:'bottom'}}}});
+
+// S9 MQL by channel
+new Chart(document.getElementById('s9chart'),{type:'bar',
+  data:{labels:D.s9.labels,datasets:[{data:D.s9.values,backgroundColor:D.s9.colors,borderRadius:5,maxBarThickness:34}]},
+  options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
+    scales:{x:{beginAtZero:true,grid:{color:'#eef1f5'},ticks:{precision:0}},y:{grid:{display:false}}},
+    plugins:{legend:{display:false}}}});
+
+// Score dist
+const sl=D.score.labels;
+new Chart(document.getElementById('scoreChart'),{type:'bar',
+  data:{labels:sl,datasets:[{data:D.score.values,
+    backgroundColor:sl.map(x=> x==='No Score' ? '#c7ccd4' : (parseInt(x)>=100 ? C.magenta : C.lightBlue)),
+    borderRadius:5,maxBarThickness:52}]},
+  options:{responsive:true,maintainAspectRatio:false,
+    scales:{y:{beginAtZero:true,grid:{color:'#eef1f5'},ticks:{precision:0}},x:{grid:{display:false}}},
+    plugins:{legend:{display:false}}}});
+
+// ===== Deeper insights =====
+const INS = D.insights;
+
+// 11: cohort quality combo chart (bars = new leads, line = SQL rate)
+new Chart(document.getElementById('cohortChart'),{type:'bar',
+  data:{labels:INS.cohort_eff.map(r=>r.m),datasets:[
+    {type:'bar',label:'New Leads',data:INS.cohort_eff.map(r=>r.new),backgroundColor:C.lbgray,borderRadius:5,maxBarThickness:44,yAxisID:'y'},
+    {type:'bar',label:'SQL',data:INS.cohort_eff.map(r=>r.sql),backgroundColor:C.lightBlue,borderRadius:5,maxBarThickness:44,yAxisID:'y'},
+    {type:'line',label:'SQL Rate %',data:INS.cohort_eff.map(r=>r.rate),borderColor:C.magenta,backgroundColor:C.magenta,tension:.3,pointRadius:4,yAxisID:'y2'}
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,
+    scales:{y:{beginAtZero:true,grid:{color:'#eef1f5'},ticks:{precision:0},title:{display:true,text:'Leads'}},
+      y2:{beginAtZero:true,max:100,position:'right',grid:{display:false},title:{display:true,text:'SQL Rate %'}},
+      x:{grid:{display:false}}},
+    plugins:{legend:{position:'bottom'}}}});
+
+// 12: channel quality table
+(function(){
+  const tb=document.getElementById('cqBody');
+  INS.channel_quality.forEach(r=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td>${r.channel}</td><td class="num">${r.leads}</td><td class="num">${r.sql}</td><td class="num"><b>${r.rate}%</b></td><td class="num">${r.avg_score}</td>`;
+    tb.appendChild(tr);
+  });
+  // totals row
+  const tot=INS.channel_quality.reduce((a,r)=>({leads:a.leads+r.leads,sql:a.sql+r.sql}),{leads:0,sql:0});
+  const tr=document.createElement('tr');
+  tr.innerHTML=`<td>TOTAL</td><td class="num">${tot.leads}</td><td class="num">${tot.sql}</td><td class="num">${Math.round(100*tot.sql/tot.leads)}%</td><td class="num">—</td>`;
+  tb.appendChild(tr);
+})();
+
+// 13: lifetime conversion rows + examples
+(function(){
+  const L=INS.lifetime;
+  const rows=[
+    {label:'Gated Resource (leadership) origin',conv:L.res_conv,total:L.res_total,color:C.lime},
+    {label:'LinkedIn (Paid Social) ad origin',conv:L.li_conv,total:L.li_total,color:C.lightBlue2},
+    {label:'Email-Nurture-touched (non-demo first)',conv:L.nur_conv,total:L.nur_total,color:C.teal}];
+  const w=document.getElementById('lifetimeRows');
+  rows.forEach(r=>{
+    const pct=r.total? (100*r.conv/r.total).toFixed(1) : '0.0';
+    const div=document.createElement('div'); div.style.marginBottom='16px';
+    div.innerHTML=`<div class="split-row" style="margin-bottom:4px;"><div class="dot" style="background:${r.color}"></div><div class="txt">${r.label}</div><div class="num">${r.conv} of ${r.total}</div></div>
+      <div style="height:8px;background:var(--lbgray);border-radius:4px;overflow:hidden;margin-left:21px;"><div style="height:100%;width:${Math.max(pct,1)}%;background:${r.color};"></div></div>
+      <div style="font-size:11px;color:var(--muted);margin-left:21px;margin-top:3px;">${pct}% lifetime conversion to demo form</div>`;
+    w.appendChild(div);
+  });
+  const ex=document.getElementById('convExamples');
+  ex.innerHTML=L.examples.map(e=>`<div>• <b>${e.email}</b> — downloaded ${e.first}, demo form ${e.contact} (<b>${e.days} days</b>)</div>`).join('');
+})();
+
+// 15: product insights
+(function(){
+  const sp=D.product.sql_pages, tb=document.getElementById('sqlPagesBody');
+  const spTop=sp.slice(0,15);
+  spTop.forEach(r=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td>${r.page}</td><td class="num">${r.may||''}</td><td class="num"><b>${r.jun||''}</b></td><td class="num">${r.ytd||''}</td>`;
+    tb.appendChild(tr);
+  });
+  const spRest=sp.slice(15);
+  if(spRest.length){
+    const rem=spRest.reduce((a,r)=>a+(r.ytd||0),0);
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td style="color:var(--muted)">… ${spRest.length} more pages</td><td class="num"></td><td class="num"></td><td class="num" style="color:var(--muted)">${rem}</td>`;
+    tb.appendChild(tr);
+  }
+  const ab=document.getElementById('assetsBody');
+  const f=o=>o&&o.n? `${o.n} <span style="color:var(--muted)">(${o.mql}/${o.sql})</span>` : '';
+  const asTop=D.product.assets.slice(0,15);
+  asTop.forEach(r=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td style="word-break:break-all;">${r.asset}</td><td class="num">${f(r.may)}</td><td class="num">${f(r.jun)}</td><td class="num">${f(r.ytd)}</td>`;
+    ab.appendChild(tr);
+  });
+  const asRest=D.product.assets.slice(15);
+  if(asRest.length){
+    const rem=asRest.reduce((a,r)=>a+(r.ytd?r.ytd.n:0),0);
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td style="color:var(--muted)">… ${asRest.length} more assets</td><td class="num"></td><td class="num"></td><td class="num" style="color:var(--muted)">${rem} downloaders</td>`;
+    ab.appendChild(tr);
+  }
+  // callout
+  const junTop=sp.filter(r=>r.jun>0).sort((a,b)=>b.jun-a.jun);
+  const etmf=sp.filter(r=>r.page.includes('etmf')).reduce((a,r)=>a+r.jun,0);
+  const mayContact=(sp.find(r=>r.page==='/contact')||{may:0}).may;
+  document.getElementById('productCallout').textContent=
+    `May's SQLs entered overwhelmingly via /contact (${mayContact} of 28) — direct, high-intent traffic. June's entered via product pages: eTMF pages account for ${etmf} of 20 contact-form SQLs, with the homepage at ${(sp.find(r=>r.page==='/ (homepage)')||{jun:0}).jun}. Product/solution pages are doing the pre-conversion persuasion this month. On gated content, June's top asset was the data-interoperability webinar (5 downloaders, 2 already SQL); all June resource activity was webinar-type.`;
+})();
+
+// 14: warm pipeline table
+(function(){
+  const W=INS.warm;
+  document.getElementById('warmTotal').textContent=W.total;
+  const tb=document.getElementById('warmBody');
+  W.top.forEach(r=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td>${r.email}</td><td class="num"><b>${r.score}</b></td><td>${r.first}</td><td>${r.channel}</td>`;
+    tb.appendChild(tr);
+  });
+})();
+</script>
+</body>
+</html>
