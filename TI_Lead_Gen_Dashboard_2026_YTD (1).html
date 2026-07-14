@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TI Lead Generation Dashboard — 2026 YTD</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{--db:#003b71;--lb:#139dd8;--lb2:#4199d8;--teal:#3bbfb5;--lime:#99cc33;--mag:#ec388a;--cream:#e7e3da;--lbg:#e0e8f5;
+--ink:#1c2a3a;--muted:#64748b;--bg:#f4f6fa;--bd:#e2e8f0;}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--ink)}
+header{background:linear-gradient(120deg,var(--db) 0%,#0a5a9c 100%);color:#fff;padding:32px 40px 26px}
+header h1{margin:0 0 6px;font-size:26px;font-weight:800}
+header p{margin:0;font-size:14px;color:#cfe3f5}
+.badges{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+.badge{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);padding:5px 12px;border-radius:20px;font-size:12px}
+main{padding:26px 40px 60px;max-width:1440px;margin:0 auto}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:26px;align-items:start}
+.kpi{background:#fff;border:1px solid var(--bd);border-radius:12px;padding:18px;position:relative;overflow:hidden}
+.kpi::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px}
+.kpi.c1::before{background:var(--db)}.kpi.c2::before{background:var(--lb)}.kpi.c3::before{background:var(--teal)}
+.kpi .label{font-size:11.5px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+.kpi .value{font-size:30px;font-weight:800;margin-top:6px;color:var(--db)}
+.kpi .sub{font-size:12px;color:var(--muted);margin-top:4px}
+.subrow{display:flex;gap:14px;margin-top:14px;padding-top:14px;border-top:1px solid var(--bd)}
+.subrow .si{flex:1}
+.subrow .sl{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.3px}
+.subrow .svv{font-size:20px;font-weight:800;margin-top:2px}
+.subrow .sn{font-size:10.5px;color:var(--muted);margin-top:2px}
+.st{font-size:16px;font-weight:800;color:var(--db);margin:34px 0 4px}
+.ss{font-size:12.5px;color:var(--muted);margin-bottom:16px;line-height:1.5}
+.ss b{color:var(--ink)}
+.fw{background:#fff;border:1px solid var(--bd);border-radius:14px;padding:26px 30px;display:flex;gap:34px;align-items:center;flex-wrap:wrap}
+.fs{display:flex;flex-direction:column;gap:10px;flex:1;min-width:320px}
+.fb .bar{height:46px;border-radius:8px;display:flex;align-items:center;padding:0 18px;color:#fff;font-weight:700;font-size:14px;justify-content:space-between}
+.fb .meta{font-size:11.5px;color:var(--muted);margin-top:4px;padding-left:2px}
+.fside{flex:1;min-width:280px}
+.sr{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.sr .dot{width:11px;height:11px;border-radius:3px;flex-shrink:0}
+.sr .txt{font-size:13px;flex:1}.sr .num{font-weight:800;font-size:14px}
+.div{height:1px;background:var(--bd);margin:14px 0}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px}
+.card{background:#fff;border:1px solid var(--bd);border-radius:14px;padding:20px 22px 12px}
+.card h3{margin:0 0 2px;font-size:14.5px;color:var(--db);font-weight:800}
+.card .desc{font-size:12px;color:var(--muted);margin-bottom:12px}
+.cb{position:relative;height:280px}.cb.tall{height:340px}
+.full{grid-column:1/-1}
+.callout{background:#fff7fb;border:1px solid #f6d3e6;border-radius:12px;padding:16px 20px;font-size:13px;color:#5a2540;margin-top:16px;line-height:1.5}
+.callout b{color:var(--mag)}
+.caveat{background:#fff8e8;border:1px solid #f2dfa8;border-radius:12px;padding:16px 20px;font-size:13px;color:#6b5320;margin-top:16px;line-height:1.5}
+.pii{background:#fff3e6;border:2px solid #e8912d;border-radius:12px;padding:14px 20px;font-size:13px;color:#8a4b06;font-weight:600;margin-bottom:14px}
+.dt{width:100%;border-collapse:collapse;font-size:13px}
+.dt th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.3px;color:var(--muted);font-weight:700;padding:10px 12px;border-bottom:2px solid var(--bd)}
+.dt td{padding:10px 12px;border-bottom:1px solid var(--bd)}
+.dt td.num,.dt th.num{text-align:right;font-variant-numeric:tabular-nums}
+.dt tr:hover td{background:#fafbfd}
+.dt.totals tr:last-child td{font-weight:800;background:var(--lbg)}
+footer{padding:20px 40px 40px;text-align:center;color:var(--muted);font-size:11.5px}
+@media(max-width:1100px){.kpis{grid-template-columns:1fr}.g2,.g3{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+<h1>TI Lead Generation Dashboard — 2026 YTD</h1>
+<p>Jan 1 – Jun 30, 2026 · leads first seen in 2026 · spam/test/internal removed · UTM + confirmed-list channel methodology</p>
+<div class="badges">
+<span class="badge"><b>230</b> unique leads</span>
+<span class="badge"><b>100</b> MQL</span>
+<span class="badge"><b>130</b> SQL (107 form / 23 score)</span>
+</div>
+</header>
+<main>
+
+<!-- 2 KPI -->
+<div class="kpis">
+<div class="kpi c1"><div class="label">Total Unique Leads</div><div class="value">230</div><div class="sub">first touch in 2026</div></div>
+<div class="kpi c2"><div class="label">MQL</div><div class="value">100</div><div class="sub">43.5% of leads</div></div>
+<div class="kpi c3"><div class="label">SQL Total</div><div class="value">130</div><div class="sub">56.5% of leads</div>
+<div class="subrow">
+<div class="si"><div class="sl" style="color:var(--lime)">Via Contact Form</div><div class="svv" style="color:var(--lime)">107</div><div class="sn">Auto-100 on demo submit</div></div>
+<div class="si"><div class="sl" style="color:var(--mag)">Via Engagement Score</div><div class="svv" style="color:var(--mag)">23</div><div class="sn">Score ≥100, no form</div></div>
+</div></div>
+</div>
+
+<!-- 3 Funnel -->
+<div class="st">Funnel Progression: Total → MQL → SQL</div>
+<div class="fw">
+<div class="fs" id="funnel"></div>
+<div class="fside">
+<div style="font-size:13px;font-weight:800;color:var(--db);margin-bottom:12px">How leads reached SQL</div>
+<div class="sr"><div class="dot" style="background:var(--lime)"></div><div class="txt">Contact Form Fill (deterministic)</div><div class="num">107</div></div>
+<div class="sr"><div class="dot" style="background:var(--mag)"></div><div class="txt">Score-Qualified (≥100, no form)</div><div class="num">23</div></div>
+<div class="div"></div>
+<div class="sr"><div class="dot" style="background:var(--db)"></div><div class="txt">SQL Total</div><div class="num">130</div></div>
+</div>
+</div>
+
+<!-- 4 Funnel by month -->
+<div class="st">Funnel Progression by Month</div>
+<div class="ss">Each cohort month's MQL / SQL–Contact Form / SQL–Score Qualified split.</div>
+<div class="card full"><div class="cb tall"><canvas id="fmChart"></canvas></div></div>
+
+<!-- 5 Quality trend -->
+<div class="st">Lead Quality Trend</div>
+<div class="ss" id="qtSub">New leads, SQL count, and SQL rate by cohort month.</div>
+<div class="card full"><div class="cb tall"><canvas id="qtChart"></canvas></div></div>
+<div class="callout" id="qtCallout"></div>
+
+<!-- 6 Engagement -->
+<div class="st">Which Engagement Types Actually Lead to a Contact Form? (2026 cohort)</div>
+<div class="ss">Of 2026 leads whose first touch was passive (resource download, LinkedIn ad, Pardot/Act-On email), how many ever later filled a demo-request form?</div>
+<div class="fw" style="align-items:stretch">
+<div style="flex:1;min-width:220px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;border-right:1px solid var(--bd);padding-right:24px">
+<div style="font-size:44px;font-weight:800;color:var(--mag)">3</div>
+<div style="font-size:13px;color:var(--muted);margin-top:4px">of 126 passive-origin 2026 leads later filled a contact form</div>
+</div>
+<div class="fside" style="flex:2" id="engRows"></div>
+</div>
+
+<!-- 7 Lifetime named list -->
+<div class="st">Lifetime Engagement → Demo Conversion</div>
+<div class="ss">Every passive-origin lead who ever filled a demo-request form, across the <b>full data window (Dec 2025 – Jun 2026)</b> — the Paid Social export reaches before 2026. Note: TI's contact forms ARE demo-request forms. Base rates: Gated Resource 3 of 65; LinkedIn Ad 0 of 71.</div>
+<div class="card full" style="padding:8px 22px 4px"><table class="dt">
+<thead><tr><th>Email</th><th>Origin</th><th>First Touch</th><th>Demo Form</th><th class="num">Lag (days)</th></tr></thead>
+<tbody id="ltBody"></tbody></table></div>
+
+<!-- 8 Service line YTD -->
+<div class="st">Form Fills by Service Line — YTD</div>
+<div class="ss"><b>Chat-provided data:</b> transcribed from the YTD tracker screenshots (Sales + Resource). Transcription validated: all 24 rows' monthly values sum exactly to the tracker's own YTD column.</div>
+<div class="g2">
+<div class="card"><h3>Sales Side (Demo Forms)</h3><div class="desc">Tracker YTD totals</div><div class="cb"><canvas id="slSales"></canvas></div></div>
+<div class="card"><h3>Resource Side (Leadership Webform)</h3><div class="desc">Tracker YTD totals</div><div class="cb"><canvas id="slRes"></canvas></div></div>
+</div>
+<div class="card full" style="margin-top:18px;padding:8px 22px 4px">
+<h3 style="padding:12px 0 4px">Transcribed Values (chat-provided — verify against your tracker)</h3>
+<table class="dt totals" id="slTable"></table>
+</div>
+<div class="caveat"><b>Tracker vs. exports reconciliation:</b> monthly Sales-side tracker totals vs. demo-form unique counts from the files: Jan 28 vs 12, Feb 38 vs 18, Mar 35 vs 11, Apr 30 vs 17, May 30 vs 30, Jun 24 vs 22. Jan–Mar tracker totals materially exceed export counts — known cause: the eTMF-archiving-checklist LinkedIn campaign was logged under eTMF on the tracker but is only partially present in the Paid Social export and absent from the demo-form exports. <b>These service-line charts show tracker numbers; every other section shows export-derived numbers — the two are never blended.</b> Summits is a separate event line outside the demo funnel (zero YTD) and is likewise never blended.</div>
+
+<!-- 9 Service line by month -->
+<div class="st">Service Line by Month</div>
+<div class="g2">
+<div class="card"><h3>Sales Side — by Month</h3><div class="desc">Stacked by service line (chat-provided tracker data)</div><div class="cb tall"><canvas id="slSalesM"></canvas></div></div>
+<div class="card"><h3>Resource Side — by Month</h3><div class="desc">Stacked by service line (chat-provided tracker data)</div><div class="cb tall"><canvas id="slResM"></canvas></div></div>
+</div>
+
+<!-- 10 Volume over time -->
+<div class="st">Lead Volume Over Time</div>
+<div class="ss">New unique leads by cohort month (export-derived), total and per named channel.</div>
+<div class="card full"><h3>Total New Leads by Month</h3><div class="cb"><canvas id="volTotal"></canvas></div></div>
+<div class="g3" style="margin-top:18px">
+<div class="card"><h3>Google Ads</h3><div class="cb"><canvas id="volGads"></canvas></div></div>
+<div class="card"><h3>LinkedIn (Paid Social)</h3><div class="cb"><canvas id="volLi"></canvas></div></div>
+<div class="card"><h3>Pardot Email</h3><div class="cb"><canvas id="volNur"></canvas></div></div>
+</div>
+
+<!-- 11 Channel performance -->
+<div class="st">Channel Performance</div>
+<div class="ss">First-touch channel of 2026 leads. <b>Methodology:</b> channels come only from UTM parameters, the gclid marker, the confirmed Google Ads list (with the conflicting-UTM refinement), and the Paid Social file's inherent identity. Chat-provided aggregates (e.g., tracker-only eTMF-checklist entries, Summits registrations) are <b>excluded</b> from these totals — they cannot be tied to individual leads in the exports.</div>
+<div class="g2">
+<div class="card"><h3>Lead Share by Channel — YTD</h3><div class="cb"><canvas id="chanDonut"></canvas></div></div>
+<div class="card"><h3>Channel by Month</h3><div class="cb"><canvas id="chanStack"></canvas></div></div>
+</div>
+<div class="card full" style="margin-top:18px;padding:8px 22px 4px">
+<h3 style="padding:12px 0 4px">Google Ads Confirmed Lead List (chat-provided — echoed back in full)</h3>
+<table class="dt"><thead><tr><th>Email</th><th>Verification</th></tr></thead><tbody id="gadsBody"></tbody></table>
+</div>
+
+<!-- 12 Channels drove leads -->
+<div class="st">What Channels Drove the Leads</div>
+<div class="ss">MQL / SQL–form / SQL–score by first-touch channel, largest at top.</div>
+<div class="card full"><div class="cb tall"><canvas id="csChart"></canvas></div></div>
+<div class="callout" id="csCallout"></div>
+
+<!-- 13 Scorecard -->
+<div class="st">Channel Quality Scorecard</div>
+<div class="card full" style="padding:8px 22px 4px"><table class="dt totals">
+<thead><tr><th>Channel</th><th class="num">Leads</th><th class="num">SQL–Form</th><th class="num">SQL–Score</th><th class="num">Rate–Form</th><th class="num">Rate–Score</th><th class="num">Total Rate</th><th class="num">Avg Max Score</th></tr></thead>
+<tbody id="scBody"></tbody></table></div>
+<div class="callout" id="scCallout"></div>
+
+<!-- 14 Score distribution -->
+<div class="st">Engagement Score Distribution</div>
+<div class="ss">2026 cohort on the Pardot scale; 100 = SQL threshold.</div>
+<div class="card full"><div class="cb tall"><canvas id="sdChart"></canvas></div></div>
+
+<!-- 15 Warm pipeline -->
+<div class="st">Warm Pipeline — MQLs Scoring 50–99, No Form Fill</div>
+<div class="pii">⚠ This section contains individual email addresses. Confirm sharing scope before distributing this dashboard further.</div>
+<div class="ss"><b><span id="warmTotal"></span> leads</b> sit in the 50–99 band with no form fill — the top 10 by score below.</div>
+<div class="card full" style="padding:8px 22px 4px"><table class="dt">
+<thead><tr><th>Lead</th><th class="num">Score</th><th>First Touch</th><th>First-Touch Channel</th></tr></thead>
+<tbody id="warmBody"></tbody></table></div>
+
+<!-- 16 Product insights -->
+<div class="st">Product Insights — Content &amp; Page Attribution</div>
+<div class="ss"><b>Limitations, stated up front:</b> (1) <b>YoY is not available</b> — the dataset begins Dec 2025/Jan 2026; there is no prior year to compare. (2) Page-view journeys aren't tracked, so "the page visited immediately before converting" cannot be determined; each converter's <b>first-touch landing page</b> is the labeled proxy.</div>
+<div class="g2">
+<div class="card"><h3>First-Touch Page of SQL Converters — YTD</h3><div class="desc">Top 15 by count · reconciles to the YTD contact-form-SQL total</div>
+<table class="dt" style="font-size:12px"><thead><tr><th>Page</th><th class="num">YTD</th></tr></thead><tbody id="pgBody"></tbody></table></div>
+<div class="card"><h3>Gated Content Assets — YTD</h3><div class="desc">Unique downloaders · (x/y) = now MQL / now SQL · current stage, correlation not attribution; samples are small</div>
+<table class="dt" style="font-size:12px"><thead><tr><th>Asset</th><th class="num">Downloaders (MQL/SQL)</th></tr></thead><tbody id="asBody"></tbody></table></div>
+</div>
+<div class="callout" id="prodCallout"></div>
+
+</main>
+<footer>TI Marketing — 2026 YTD Lead Generation Dashboard · Chart.js 4.4.1 · export-derived except where labeled chat-provided</footer>
+
+<script>
+const D = {"year": 2026, "months": ["Jan", "Feb", "Mar", "Apr", "May", "Jun"], "kpi": {"total": 230, "mql": 100, "sql": 130, "cf": 107, "sq": 23}, "monthly": [{"m": "Jan", "new": 46, "mql": 26, "cf": 13, "sq": 7, "sql": 20, "rate": 43.5}, {"m": "Feb", "new": 41, "mql": 18, "cf": 18, "sq": 5, "sql": 23, "rate": 56.1}, {"m": "Mar", "new": 36, "mql": 21, "cf": 11, "sq": 4, "sql": 15, "rate": 41.7}, {"m": "Apr", "new": 40, "mql": 20, "cf": 17, "sq": 3, "sql": 20, "rate": 50.0}, {"m": "May", "new": 38, "mql": 8, "cf": 28, "sq": 2, "sql": 30, "rate": 78.9}, {"m": "Jun", "new": 29, "mql": 7, "cf": 20, "sq": 2, "sql": 22, "rate": 75.9}], "eng": {"res_t": 65, "res_c": 3, "li_t": 61, "li_c": 0, "nur_t": 5, "nur_c": 0}, "lifetime": {"res_t": 65, "res_c": 3, "li_t": 71, "li_c": 0, "window": ["Dec 2025", "Jun 2026"], "converts": [{"email": "vgv@lilly.com", "origin": "Gated Resource", "first": "2026-01-14", "demo": "2026-05-27", "lag": 132}, {"email": "rb@ghres.com", "origin": "Gated Resource", "first": "2026-03-02", "demo": "2026-03-18", "lag": 16}, {"email": "bella.chen@adlainortye.com", "origin": "Gated Resource", "first": "2026-04-09", "demo": "2026-04-09", "lag": 0}]}, "service": {"lines": ["TI General", "eClinical / multiple products", "TMF", "eTMF", "CTMS", "SSU", "eISF", "eArchive", "LMS", "AI / ML", "Summits", "Other"], "sales": {"TI General": [0, 0, 1, 5, 2, 0], "eClinical / multiple products": [7, 8, 7, 9, 10, 16], "TMF": [1, 3, 2, 0, 3, 0], "eTMF": [16, 22, 24, 12, 0, 1], "CTMS": [0, 1, 0, 3, 1, 2], "SSU": [1, 1, 0, 1, 0, 0], "eISF": [1, 0, 0, 0, 0, 1], "eArchive": [0, 0, 0, 0, 0, 0], "LMS": [1, 1, 1, 0, 0, 0], "AI / ML": [0, 0, 0, 0, 0, 0], "Summits": [0, 0, 0, 0, 0, 0], "Other": [1, 2, 0, 0, 14, 4]}, "res": {"TI General": [8, 6, 6, 1, 3, 2], "eClinical / multiple products": [3, 1, 2, 0, 0, 5], "TMF": [4, 2, 0, 11, 1, 0], "eTMF": [1, 0, 3, 3, 1, 0], "CTMS": [0, 0, 1, 0, 0, 0], "SSU": [0, 0, 2, 0, 0, 0], "eISF": [0, 0, 0, 0, 0, 0], "eArchive": [0, 0, 0, 0, 0, 0], "LMS": [0, 0, 0, 0, 0, 0], "AI / ML": [0, 4, 0, 0, 2, 2], "Summits": [0, 0, 0, 0, 0, 0], "Other": [2, 0, 0, 0, 0, 0]}, "sales_ytd": {"TI General": 8, "eClinical / multiple products": 57, "TMF": 9, "eTMF": 75, "CTMS": 7, "SSU": 3, "eISF": 2, "eArchive": 0, "LMS": 3, "AI / ML": 0, "Summits": 0, "Other": 21}, "res_ytd": {"TI General": 26, "eClinical / multiple products": 11, "TMF": 18, "eTMF": 8, "CTMS": 1, "SSU": 2, "eISF": 0, "eArchive": 0, "LMS": 0, "AI / ML": 8, "Summits": 0, "Other": 2}, "recon": [{"m": "Jan", "tracker": 28, "exports": 12, "diff": 16}, {"m": "Feb", "tracker": 38, "exports": 18, "diff": 20}, {"m": "Mar", "tracker": 35, "exports": 11, "diff": 24}, {"m": "Apr", "tracker": 30, "exports": 17, "diff": 13}, {"m": "May", "tracker": 30, "exports": 30, "diff": 0}, {"m": "Jun", "tracker": 24, "exports": 22, "diff": 2}], "valid": true}, "chan_ytd": {"AI Referral (ChatGPT)": 6, "Direct / Organic (No UTM)": 135, "Google Ads (Paid Search)": 19, "Pardot Email": 9, "LinkedIn (Paid Social)": 61}, "chan_by_month": {"AI Referral (ChatGPT)": [2, 0, 0, 1, 1, 2], "Direct / Organic (No UTM)": [20, 19, 17, 29, 27, 23], "Google Ads (Paid Search)": [4, 1, 4, 2, 6, 2], "Pardot Email": [1, 6, 0, 0, 1, 1], "LinkedIn (Paid Social)": [19, 15, 15, 8, 3, 1]}, "vol_total": [46, 41, 36, 40, 38, 29], "gads_echo": [{"email": "bella.chen@adlainortye.com", "status": "UTM-verified (google/cpc)"}, {"email": "bill.ohara-c@arvinas.com", "status": "UTM-verified (google/cpc)"}, {"email": "chabib@phoenix-cr.com", "status": "UTM-verified (google/cpc)"}, {"email": "dholakir@mskcc.org", "status": "UTM-verified (google/cpc)"}, {"email": "dsears@flaretx.com", "status": "UTM-verified (google/cpc)"}, {"email": "dylan.t.mcloud.civ@mail.mil", "status": "UTM-verified (google/cpc)"}, {"email": "egonzalez@mcallenresearch.com", "status": "UTM-verified (google/cpc)"}, {"email": "elhan.ahmedovski@auslromagna.it", "status": "override-only (no UTM)"}, {"email": "info@clinara.ca", "status": "UTM-verified (google/cpc)"}, {"email": "jay@ensembleclinical.com", "status": "override-only (no UTM)"}, {"email": "kboutin@theroyal.ca", "status": "UTM-verified (google/cpc)"}, {"email": "marcie.portillo@sharp.com", "status": "UTM-verified (google/cpc)"}, {"email": "mfailor@maiabiotech.com", "status": "UTM-verified (google/cpc)"}, {"email": "nancy.dou@hengrui.com", "status": "UTM-verified (google/cpc)"}, {"email": "pingyun.lyu@regeneron.com", "status": "UTM-verified (google/cpc)"}, {"email": "ralrabeh@besins-healthcare.com", "status": "override-only (no UTM)"}, {"email": "ritu.monga@northeastern.edu", "status": "UTM-verified (google/cpc)"}, {"email": "samatya@mbxbio.com", "status": "UTM-verified (google/cpc)"}], "chan_stage": {"AI Referral (ChatGPT)": {"MQL": 1, "CF": 5, "SQ": 0}, "Direct / Organic (No UTM)": {"MQL": 37, "CF": 81, "SQ": 17}, "Google Ads (Paid Search)": {"MQL": 2, "CF": 17, "SQ": 0}, "Pardot Email": {"MQL": 4, "CF": 4, "SQ": 1}, "LinkedIn (Paid Social)": {"MQL": 56, "CF": 0, "SQ": 5}}, "scorecard": [{"channel": "Direct / Organic (No UTM)", "leads": 135, "cf": 81, "sq": 17, "rate_cf": 60, "rate_sq": 13, "rate": 73, "avg": 141}, {"channel": "LinkedIn (Paid Social)", "leads": 61, "cf": 0, "sq": 5, "rate_cf": 0, "rate_sq": 8, "rate": 8, "avg": 56}, {"channel": "Google Ads (Paid Search)", "leads": 19, "cf": 17, "sq": 0, "rate_cf": 89, "rate_sq": 0, "rate": 89, "avg": 107}, {"channel": "Pardot Email", "leads": 9, "cf": 4, "sq": 1, "rate_cf": 44, "rate_sq": 11, "rate": 56, "avg": 249}, {"channel": "AI Referral (ChatGPT)", "leads": 6, "cf": 5, "sq": 0, "rate_cf": 83, "rate_sq": 0, "rate": 83, "avg": 112}], "sdist": {"No Score": 11, "25-49": 41, "50-74": 44, "75-99": 8, "100-149": 76, "150-199": 13, "200-299": 25, "300-499": 10, "500+": 2}, "warm": {"total": 54, "top": [{"email": "jessica.bache.hansen@vicorepharma.com", "score": 98, "first": "2026-05-18", "chan": "Direct / Organic (No UTM)"}, {"email": "adiaz@alnylam.com", "score": 94, "first": "2025-12-15", "chan": "LinkedIn (Paid Social)"}, {"email": "susana.schmitz@uni-rostock.de", "score": 91, "first": "2026-03-06", "chan": "Google Ads (Paid Search)"}, {"email": "sevgin.gunes@occlutech.com", "score": 89, "first": "2026-02-09", "chan": "Pardot Email"}, {"email": "liz.okeke@teleflex.com", "score": 88, "first": "2026-03-26", "chan": "LinkedIn (Paid Social)"}, {"email": "gmatias@vectorb2b.com", "score": 82, "first": "2026-04-08", "chan": "Direct / Organic (No UTM)"}, {"email": "nmalpartida@tech-res.com", "score": 80, "first": "2026-01-20", "chan": "Pardot Email"}, {"email": "j.oh@medpace.com", "score": 76, "first": "2026-06-26", "chan": "Direct / Organic (No UTM)"}, {"email": "liujuan@juventas.cn", "score": 75, "first": "2026-06-26", "chan": "Direct / Organic (No UTM)"}, {"email": "teresa.reisig@arthrex.com", "score": 75, "first": "2025-12-15", "chan": "LinkedIn (Paid Social)"}], "band_csv": 89}, "pages": [{"page": "/contact", "ytd": 25}, {"page": "/ (homepage)", "ytd": 22}, {"page": "(none recorded)", "ytd": 11}, {"page": "/etmf-tmf-solutions", "ytd": 7}, {"page": "/etmf-tmf-solutions/etmf", "ytd": 6}, {"page": "/CTMS", "ytd": 6}, {"page": "/optimize-tmf-roadshow-2026", "ytd": 5}, {"page": "/eclinical-platform", "ytd": 2}, {"page": "/eArchive", "ytd": 2}, {"page": "/eISF", "ytd": 2}, {"page": "/eClinical-platform-overview", "ytd": 2}, {"page": "/eCTD-Submission-Solution", "ytd": 2}, {"page": "/request-a-demo", "ytd": 2}, {"page": "/service-desk", "ytd": 1}, {"page": "/investigator-database", "ytd": 1}, {"page": "/thought-leadership/surfacing-your-ctms-and-etmf-using-ai/950", "ytd": 1}, {"page": "/etmf-tmf-solutions/tmf-services", "ytd": 1}, {"page": "/event/optimize-tmf-roadshow-barcelona", "ytd": 1}, {"page": "/elearning-service", "ytd": 1}, {"page": "/investigator-meetings", "ytd": 1}, {"page": "/optimize-2026", "ytd": 1}, {"page": "/blog/ctms-integration", "ytd": 1}, {"page": "/access/ultimate-tmf-resource-pack", "ytd": 1}, {"page": "/leadership", "ytd": 1}, {"page": "/etmf-migration", "ytd": 1}, {"page": "/blog/what-your-monitoring-reports-are-already-telling-you-and-why-no-one-listening", "ytd": 1}], "assets": [{"asset": "ich-e6r3-tmf-oversight-best-practices-ensuring-compliance-and-quality", "n": 9, "mql": 6, "sql": 3}, {"asset": "understanding-risk-based-capa", "n": 8, "mql": 6, "sql": 2}, {"asset": "surfacing-your-ctms-and-etmf-using-ai", "n": 6, "mql": 2, "sql": 4}, {"asset": "data-interoperability-enablement-adopting-end-end-clinical-systems-apa", "n": 5, "mql": 3, "sql": 2}, {"asset": "tmf-rescue-checklist-gap-analysis-and-remediate-strategies", "n": 4, "mql": 4, "sql": 0}, {"asset": "beyond-surface-level-ai-deep-inspection-etmf-records-quality-complianc", "n": 4, "mql": 0, "sql": 4}, {"asset": "ai-clinical-operations-where-it-actually-saves-30-60-days-and-where-it", "n": 4, "mql": 3, "sql": 1}, {"asset": "etmf-implementation-checklist", "n": 3, "mql": 3, "sql": 0}, {"asset": "etmf-migration-download", "n": 3, "mql": 2, "sql": 1}, {"asset": "20250721_tmfmockinspection_internal_quality_review_checklist_v1.01.pdf", "n": 3, "mql": 3, "sql": 0}, {"asset": "key-takeaways-from-optimize-london", "n": 2, "mql": 0, "sql": 2}, {"asset": "mhra-inspection-insights-part-2-metrics-matter", "n": 2, "mql": 1, "sql": 1}, {"asset": "mhra-inspection-insights", "n": 2, "mql": 1, "sql": 1}, {"asset": "can-ai-help-alleviate-challenges-with-clinical-site-selection", "n": 1, "mql": 1, "sql": 0}, {"asset": "trial-interactive-it-fact-sheet", "n": 1, "mql": 1, "sql": 0}, {"asset": "tmf-mock-inspection-and-internal-quality-review-checklist", "n": 1, "mql": 0, "sql": 1}, {"asset": "seamless-tmf-operations-best-practices-for-efficiency-and-long-term-su", "n": 1, "mql": 0, "sql": 1}, {"asset": "top-7-oversight-pitfalls-sponsors-must-avoid", "n": 1, "mql": 0, "sql": 1}, {"asset": "audit-proof-automation", "n": 1, "mql": 1, "sql": 0}, {"asset": "essential-checklist-for-etmf-archiving", "n": 1, "mql": 1, "sql": 0}, {"asset": "960", "n": 1, "mql": 0, "sql": 1}, {"asset": "ask-expert-tmf-series-risk-proportionate-oversight-works", "n": 1, "mql": 1, "sql": 0}, {"asset": "ctms-implementation-checklist-download", "n": 1, "mql": 1, "sql": 0}, {"asset": "1010", "n": 1, "mql": 1, "sql": 0}, {"asset": "(no asset link)", "n": 1, "mql": 0, "sql": 1}, {"asset": "ask-expert-tmf-series-oversight-101-day-one-confidence", "n": 1, "mql": 1, "sql": 0}, {"asset": "no-file-left-behind", "n": 1, "mql": 1, "sql": 0}, {"asset": "cdisc-tmf-europe-interchange-key-takeaways-and-insights", "n": 1, "mql": 1, "sql": 0}, {"asset": "ich-e6r3-and-mhra-guidance-what-it-means-tmf", "n": 1, "mql": 0, "sql": 1}, {"asset": "de-los-informes-de-monitorizacion-la-preparacion-para-inspecciones-com", "n": 1, "mql": 0, "sql": 1}, {"asset": "three-pillars-of-quality-management", "n": 1, "mql": 1, "sql": 0}], "excl": {"generic_demo": {"kept": 84, "dropped": {"company": 2, "domain": 12, "alphex": 1}}, "dynamic_demo": {"kept": 33, "dropped": {"domain": 13, "alphex": 1, "test1992": 1, "test": 1}}, "leadership": {"kept": 81, "dropped": {"domain": 129, "namecombo": 41, "company": 9, "alphex": 10, "nodate/email": 2, "test": 1}}, "paid_social": {"kept": 71, "dropped": {"company": 3}}}, "band_split": {"yes": 67, "no": 22}};
+const C = {db:'#003b71',lb:'#139dd8',lb2:'#4199d8',teal:'#3bbfb5',lime:'#99cc33',mag:'#ec388a',lbg:'#e0e8f5'};
+const CHC = {'Direct / Organic (No UTM)':'#003b71','Google Ads (Paid Search)':'#139dd8','Google Display (Paid)':'#5a7fa8','LinkedIn (Paid Social)':'#ec388a','LinkedIn (Organic Social)':'#4199d8','Pardot Email':'#3bbfb5','AI Referral (ChatGPT)':'#99cc33'};
+Chart.defaults.font.family='Arial, Helvetica, sans-serif';
+Chart.defaults.color='#475569';
+Chart.defaults.plugins.legend.labels.boxWidth=12;
+Chart.defaults.plugins.legend.labels.font={size:11};
+const noLeg={legend:{display:false}};
+
+// 3 funnel
+(function(){
+  const s=[{l:'Total Leads',v:D.kpi.total,c:C.db},{l:'MQL',v:D.kpi.mql,c:C.lb},{l:'SQL',v:D.kpi.sql,c:C.mag}];
+  const w=document.getElementById('funnel');
+  s.forEach((x,i)=>{
+    const pct=Math.max(100*x.v/s[0].v,16);
+    const div=document.createElement('div');div.className='fb';
+    div.innerHTML=`<div class="bar" style="width:${pct}%;background:${x.c}"><span>${x.l}</span><span>${x.v}</span></div>
+<div class="meta">${i===0?'100% of 2026 cohort':(100*x.v/s[0].v).toFixed(0)+'% of leads'}</div>`;
+    w.appendChild(div);
+  });
+})();
+
+// 4 funnel by month
+new Chart(document.getElementById('fmChart'),{type:'bar',
+ data:{labels:D.months,datasets:[
+  {label:'MQL',data:D.monthly.map(r=>r.mql),backgroundColor:C.lb,stack:'s',borderRadius:3},
+  {label:'SQL – Contact Form',data:D.monthly.map(r=>r.cf),backgroundColor:C.teal,stack:'s',borderRadius:3},
+  {label:'SQL – Score Qualified',data:D.monthly.map(r=>r.sq),backgroundColor:C.mag,stack:'s',borderRadius:3}]},
+ options:{responsive:true,maintainAspectRatio:false,
+  scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,beginAtZero:true,grid:{color:'#eef1f5'},ticks:{precision:0}}},
+  plugins:{legend:{position:'bottom'}}}});
+
+// 5 quality trend
+(function(){
+  new Chart(document.getElementById('qtChart'),{type:'bar',
+   data:{labels:D.months,datasets:[
+    {type:'bar',label:'New Leads',data:D.monthly.map(r=>r.new),backgroundColor:C.lbg,borderRadius:4,yAxisID:'y'},
+    {type:'bar',label:'SQL',data:D.monthly.map(r=>r.sql),backgroundColor:C.lb,borderRadius:4,yAxisID:'y'},
+    {type:'line',label:'SQL Rate %',data:D.monthly.map(r=>r.rate),borderColor:C.mag,backgroundColor:C.mag,tension:.3,pointRadius:4,yAxisID:'y2'}]},
+   options:{responsive:true,maintainAspectRatio:false,
+    scales:{y:{beginAtZero:true,grid:{color:'#eef1f5'},ticks:{precision:0},title:{display:true,text:'Leads'}},
+     y2:{beginAtZero:true,max:100,position:'right',grid:{display:false},title:{display:true,text:'SQL Rate %'}},
+     x:{grid:{display:false}}},plugins:{legend:{position:'bottom'}}}});
+  const best=D.monthly.reduce((a,b)=>b.rate>a.rate?b:a), worst=D.monthly.reduce((a,b)=>b.rate<a.rate?b:a);
+  document.getElementById('qtCallout').innerHTML=
+   `<b>Best month:</b> ${best.m} (${best.rate}% SQL rate, ${best.sql} of ${best.new}). <b>Worst:</b> ${worst.m} (${worst.rate}%, ${worst.sql} of ${worst.new}). Volume trend and quality trend move in opposite directions across the half.`;
+})();
+
+// 6 engagement rows
+(function(){
+  const rows=[
+   {l:'Started via Gated Resource download',c:D.eng.res_c,t:D.eng.res_t,col:C.lime},
+   {l:'Started via LinkedIn (Paid Social) ad',c:D.eng.li_c,t:D.eng.li_t,col:C.lb2},
+   {l:'Ever had a Pardot/Act-On email touch (non-demo first)',c:D.eng.nur_c,t:D.eng.nur_t,col:C.teal}];
+  const w=document.getElementById('engRows');
+  rows.forEach(r=>{
+    const pct=r.t?(100*r.c/r.t).toFixed(1):'0.0';
+    const div=document.createElement('div');div.style.marginBottom='16px';
+    div.innerHTML=`<div class="sr" style="margin-bottom:4px"><div class="dot" style="background:${r.col}"></div><div class="txt">${r.l}</div><div class="num">${r.c} of ${r.t}</div></div>
+<div style="height:8px;background:var(--lbg);border-radius:4px;overflow:hidden;margin-left:21px"><div style="height:100%;width:${Math.max(pct,1)}%;background:${r.col}"></div></div>
+<div style="font-size:11px;color:var(--muted);margin-left:21px;margin-top:3px">${pct}% conversion to demo form</div>`;
+    w.appendChild(div);
+  });
+})();
+
+// 7 lifetime table
+(function(){
+  const tb=document.getElementById('ltBody');
+  if(!D.lifetime.converts.length){tb.innerHTML='<tr><td colspan="5" style="color:var(--muted)">No passive-origin leads have ever converted to a demo form in the data window.</td></tr>';return;}
+  D.lifetime.converts.forEach(r=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td>${r.email}</td><td>${r.origin}</td><td>${r.first}</td><td>${r.demo}</td><td class="num"><b>${r.lag}</b></td>`;
+    tb.appendChild(tr);
+  });
+})();
+
+// 8 service line YTD bars + transcribed table
+(function(){
+  const lines=D.service.lines;
+  function bars(id,ytd,color){
+    const ks=lines.filter(l=>ytd[l]>0).sort((a,b)=>ytd[b]-ytd[a]);
+    new Chart(document.getElementById(id),{type:'bar',
+     data:{labels:ks,datasets:[{data:ks.map(k=>ytd[k]),backgroundColor:color,borderRadius:4,maxBarThickness:30}]},
+     options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:noLeg,
+      scales:{x:{beginAtZero:true,grid:{color:'#eef1f5'},ticks:{precision:0}},y:{grid:{display:false}}}}});
+  }
+  bars('slSales',D.service.sales_ytd,C.teal);
+  bars('slRes',D.service.res_ytd,C.mag);
+  // transcribed table: line | months... | YTD  for both sides
+  const t=document.getElementById('slTable');
+  let h='<thead><tr><th>Service Line</th>'+D.months.map(m=>`<th class="num">${m} S</th>`).join('')+'<th class="num">S YTD</th>'+D.months.map(m=>`<th class="num">${m} R</th>`).join('')+'<th class="num">R YTD</th></tr></thead><tbody>';
+  lines.forEach(l=>{
+    h+=`<tr><td>${l}</td>`+D.service.sales[l].map(v=>`<td class="num">${v||''}</td>`).join('')+`<td class="num"><b>${D.service.sales_ytd[l]||''}</b></td>`
+      +D.service.res[l].map(v=>`<td class="num">${v||''}</td>`).join('')+`<td class="num"><b>${D.service.res_ytd[l]||''}</b></td></tr>`;
+  });
+  const sTot=D.months.map((_,i)=>lines.reduce((a,l)=>a+D.service.sales[l][i],0));
+  const rTot=D.months.map((_,i)=>lines.reduce((a,l)=>a+D.service.res[l][i],0));
+  h+=`<tr><td>TOTAL</td>`+sTot.map(v=>`<td class="num">${v}</td>`).join('')+`<td class="num">${sTot.reduce((a,b)=>a+b,0)}</td>`
+    +rTot.map(v=>`<td class="num">${v}</td>`).join('')+`<td class="num">${rTot.reduce((a,b)=>a+b,0)}</td></tr></tbody>`;
+  t.innerHTML=h;
+})();
+
+// 9 service line by month stacked
+(function(){
+  const PAL=['#003b71','#139dd8','#4199d8','#3bbfb5','#99cc33','#ec388a','#5a7fa8','#e7a33b','#8e6bb0','#c0562f','#7a8ba0','#444444'];
+  function stacked(id,tbl){
+    const ks=D.service.lines.filter(l=>tbl[l].some(v=>v>0));
+    new Chart(document.getElementById(id),{type:'bar',
+     data:{labels:D.months,datasets:ks.map((k,i)=>({label:k,data:tbl[k],backgroundColor:PAL[i%PAL.length],stack:'s',borderRadius:2,maxBarThickness:44}))},
+     options:{responsive:true,maintainAspectRatio:false,
+      scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,beginAtZero:true,grid:{color:'#eef1f5'},ticks:{precision:0}}},
+      plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10}}}}}});
+  }
+  stacked('slSalesM',D.service.sales);
+  stacked('slResM',D.service.res);
+})();
+
+// 10 volume over time
+(function(){
+  function vol(id,series,color){
+    new Chart(document.getElementById(id),{type:'bar',
+     data:{labels:D.months,datasets:[{data:series,backgroundColor:color,borderRadius:4,maxBarThickness:44}]},
+     options:{responsive:true,maintainAspectRatio:false,plugins:noLeg,
+      scales:{y:{beginAtZero:true,grid:{color:'#eef1f5'},ticks:{precision:0}},x:{grid:{display:false}}}}});
+  }
+  vol('volTotal',D.vol_total,C.db);
+  const z=[0,0,0,0,0,0].slice(0,D.months.length);
+  vol('volGads',D.chan_by_month['Google Ads (Paid Search)']||z,C.lb);
+  vol('volLi',D.chan_by_month['LinkedIn (Paid Social)']||z,C.mag);
+  vol('volNur',D.chan_by_month['Pardot Email']||z,C.teal);
+})();
+
+// 11 channel donut + stacked + gads echo
+(function(){
+  const names=Object.keys(D.chan_ytd).sort((a,b)=>D.chan_ytd[b]-D.chan_ytd[a]);
+  new Chart(document.getElementById('chanDonut'),{type:'doughnut',
+   data:{labels:names,datasets:[{data:names.map(n=>D.chan_ytd[n]),backgroundColor:names.map(n=>CHC[n]||'#7a8ba0'),borderWidth:2,borderColor:'#fff'}]},
+   options:{responsive:true,maintainAspectRatio:false,cutout:'62%',plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10.5}}}}}});
+  new Chart(document.getElementById('chanStack'),{type:'bar',
+   data:{labels:D.months,datasets:names.map(n=>({label:n,data:D.chan_by_month[n],backgroundColor:CHC[n]||'#7a8ba0',stack:'s',borderRadius:2}))},
+   options:{responsive:true,maintainAspectRatio:false,
+    scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,beginAtZero:true,grid:{color:'#eef1f5'},ticks:{precision:0}}},
+    plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10}}}}}});
+  const tb=document.getElementById('gadsBody');
+  D.gads_echo.forEach(r=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td>${r.email}</td><td>${r.status}</td>`;
+    tb.appendChild(tr);
+  });
+})();
+
+// 12 chan x stage
+(function(){
+  const ks=Object.keys(D.chan_stage).sort((a,b)=>{
+    const s=x=>D.chan_stage[x].MQL+D.chan_stage[x].CF+D.chan_stage[x].SQ;
+    return s(b)-s(a);});
+  new Chart(document.getElementById('csChart'),{type:'bar',
+   data:{labels:ks,datasets:[
+    {label:'MQL',data:ks.map(k=>D.chan_stage[k].MQL),backgroundColor:C.lb,stack:'s',borderRadius:2},
+    {label:'SQL – Contact Form',data:ks.map(k=>D.chan_stage[k].CF),backgroundColor:C.teal,stack:'s',borderRadius:2},
+    {label:'SQL – Score Qualified',data:ks.map(k=>D.chan_stage[k].SQ),backgroundColor:C.mag,stack:'s',borderRadius:2}]},
+   options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
+    scales:{x:{stacked:true,beginAtZero:true,grid:{color:'#eef1f5'},ticks:{precision:0}},y:{stacked:true,grid:{display:false}}},
+    plugins:{legend:{position:'bottom'}}}});
+  const scoreOnly=ks.filter(k=>{const d=D.chan_stage[k];return d.SQ>0&&d.CF===0;});
+  document.getElementById('csCallout').innerHTML= scoreOnly.length?
+   `<b>Score-only conversion flag:</b> ${scoreOnly.join(', ')} reach SQL exclusively via engagement score with zero form fills — worth checking whether any scores were manually adjusted to "sales-ready" in Pardot.`:
+   `<b>No score-only channels:</b> every channel's SQLs include at least one direct form fill — no sign of purely score-driven (potentially manually adjusted) conversion.`;
+})();
+
+// 13 scorecard
+(function(){
+  const tb=document.getElementById('scBody');
+  D.scorecard.forEach(r=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td>${r.channel}</td><td class="num">${r.leads}</td><td class="num">${r.cf}</td><td class="num">${r.sq}</td><td class="num">${r.rate_cf}%</td><td class="num">${r.rate_sq}%</td><td class="num"><b>${r.rate}%</b></td><td class="num">${r.avg}</td>`;
+    tb.appendChild(tr);
+  });
+  const tot=D.scorecard.reduce((a,r)=>({leads:a.leads+r.leads,cf:a.cf+r.cf,sq:a.sq+r.sq}),{leads:0,cf:0,sq:0});
+  const tr=document.createElement('tr');
+  tr.innerHTML=`<td>TOTAL</td><td class="num">${tot.leads}</td><td class="num">${tot.cf}</td><td class="num">${tot.sq}</td><td class="num">${Math.round(100*tot.cf/tot.leads)}%</td><td class="num">${Math.round(100*tot.sq/tot.leads)}%</td><td class="num">${Math.round(100*(tot.cf+tot.sq)/tot.leads)}%</td><td class="num">—</td>`;
+  tb.appendChild(tr);
+  const g=D.scorecard.find(r=>r.channel==='Google Ads (Paid Search)'), l=D.scorecard.find(r=>r.channel==='LinkedIn (Paid Social)');
+  document.getElementById('scCallout').innerHTML=(g&&l)?
+   `<b>Paid channel contrast:</b> Google Ads converts ${g.rate}% of its ${g.leads} leads to SQL (avg score ${g.avg}) — almost entirely via form fill (${g.rate_cf}% vs ${g.rate_sq}% score). LinkedIn (Paid Social) converts ${l.rate}% of ${l.leads} (avg score ${l.avg}), with ${l.cf} form-fill SQLs ever. If spend is comparable, this is the clearest reallocation case in the data; LinkedIn's value must rest on audience/brand goals rather than pipeline.`:
+   'Paid channel comparison unavailable (a paid channel has no 2026 leads).';
+})();
+
+// 14 score distribution
+(function(){
+  const ks=Object.keys(D.sdist);
+  new Chart(document.getElementById('sdChart'),{type:'bar',
+   data:{labels:ks,datasets:[{data:ks.map(k=>D.sdist[k]),
+    backgroundColor:ks.map(k=>k==='No Score'?'#c7ccd4':(parseInt(k)>=100?C.mag:C.lb)),borderRadius:4,maxBarThickness:52}]},
+   options:{responsive:true,maintainAspectRatio:false,plugins:noLeg,
+    scales:{y:{beginAtZero:true,grid:{color:'#eef1f5'},ticks:{precision:0}},x:{grid:{display:false}}}}});
+})();
+
+// 15 warm
+(function(){
+  document.getElementById('warmTotal').textContent=D.warm.total;
+  const tb=document.getElementById('warmBody');
+  D.warm.top.forEach(r=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td>${r.email}</td><td class="num"><b>${r.score}</b></td><td>${r.first}</td><td>${r.chan}</td>`;
+    tb.appendChild(tr);
+  });
+})();
+
+// 16 product
+(function(){
+  const top=D.pages.slice(0,15), rest=D.pages.slice(15);
+  const tb=document.getElementById('pgBody');
+  top.forEach(r=>{const tr=document.createElement('tr');tr.innerHTML=`<td>${r.page}</td><td class="num">${r.ytd}</td>`;tb.appendChild(tr);});
+  if(rest.length){const rem=rest.reduce((a,r)=>a+r.ytd,0);
+    const tr=document.createElement('tr');tr.innerHTML=`<td style="color:var(--muted)">… ${rest.length} more pages</td><td class="num" style="color:var(--muted)">${rem}</td>`;tb.appendChild(tr);}
+  const at=D.assets.slice(0,15), ar=D.assets.slice(15);
+  const ab=document.getElementById('asBody');
+  at.forEach(r=>{const tr=document.createElement('tr');
+    tr.innerHTML=`<td style="word-break:break-all">${r.asset}</td><td class="num">${r.n} <span style="color:var(--muted)">(${r.mql}/${r.sql})</span></td>`;ab.appendChild(tr);});
+  if(ar.length){const rem=ar.reduce((a,r)=>a+r.n,0);
+    const tr=document.createElement('tr');tr.innerHTML=`<td style="color:var(--muted)">… ${ar.length} more assets</td><td class="num" style="color:var(--muted)">${rem} downloaders</td>`;ab.appendChild(tr);}
+  const p1=D.pages[0], eTmf=D.pages.filter(r=>r.page.includes('etmf')).reduce((a,r)=>a+r.ytd,0);
+  document.getElementById('prodCallout').innerHTML=
+   `<b>The year so far in content:</b> ${p1.page} is the top converter entry point (${p1.ytd} of ${D.kpi.cf} contact-form SQLs), with product pages (eTMF pages: ${eTmf}) carrying a growing share in recent months. Top gated assets are regulatory/compliance topics — the (x/y) stage splits show which audiences end up sales-ready, with the small-sample caveat applying per asset.`;
+})();
+</script>
+</body>
+</html>
