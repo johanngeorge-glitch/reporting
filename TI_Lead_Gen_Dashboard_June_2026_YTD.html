@@ -2,41 +2,39 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TI Lead Generation Dashboard — July 2026</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
   :root{
     --dark-blue:#003b71; --light-blue:#139dd8; --light-blue2:#4199d8;
-    --teal:#3bbfb5; --lime:#99cc33; --magenta:#ec388a; --cream:#e7e3da; --lbgray:#e0e8f5;
+    --teal:#3bbfb5; --blast-teal:#7fd4cd; --lime:#99cc33; --magenta:#ec388a; --cream:#e7e3da; --lbgray:#e0e8f5;
     --ink:#1c2a3a; --muted:#64748b; --card-bg:#ffffff; --page-bg:#f4f6fa; --border:#e2e8f0;
   }
   *{box-sizing:border-box;}
   body{margin:0; font-family:Arial, Helvetica, sans-serif; background:var(--page-bg); color:var(--ink);}
   header{background:linear-gradient(120deg, var(--dark-blue) 0%, #0a5a9c 100%); color:#fff; padding:32px 40px 26px;}
   header h1{margin:0 0 6px; font-size:26px; font-weight:800; letter-spacing:.2px;}
-  header p{margin:0; font-size:14px; color:#cfe3f5;}
   .badge-row{display:flex; gap:10px; margin-top:14px; flex-wrap:wrap;}
   .badge{background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.25); padding:5px 12px; border-radius:20px; font-size:12px; color:#fff;}
   .badge.down{background:rgba(236,56,138,.25); border-color:rgba(236,56,138,.5);}
+  .badge.up{background:rgba(153,204,51,.25); border-color:rgba(153,204,51,.5);}
   main{padding:26px 40px 60px; max-width:1440px; margin:0 auto;}
 
-  .kpi-grid{display:grid; grid-template-columns:repeat(5,1fr); gap:14px; margin-bottom:26px;}
-  .kpi{background:var(--card-bg); border:1px solid var(--border); border-radius:12px; padding:18px; position:relative; overflow:hidden;}
+  .kpi-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:26px; align-items:start;}
+  .kpi{background:var(--card-bg); border:1px solid var(--border); border-radius:12px; padding:18px 18px 16px; position:relative; overflow:hidden;}
   .kpi::before{content:""; position:absolute; left:0; top:0; bottom:0; width:4px;}
-  .kpi.c1::before{background:var(--dark-blue);} .kpi.c2::before{background:var(--light-blue);}
-  .kpi.c3::before{background:var(--teal);} .kpi.c4::before{background:var(--lime);} .kpi.c5::before{background:var(--magenta);}
-  .kpi .label{font-size:11px; color:var(--muted); font-weight:700; text-transform:uppercase; letter-spacing:.4px;}
+  .kpi.c1::before{background:var(--dark-blue);} .kpi.c2::before{background:var(--light-blue);} .kpi.c3::before{background:var(--teal);}
+  .kpi .label{font-size:11.5px; color:var(--muted); font-weight:700; text-transform:uppercase; letter-spacing:.4px;}
   .kpi .value{font-size:30px; font-weight:800; margin-top:6px; color:var(--dark-blue);}
-  .kpi .sub{font-size:11.5px; color:var(--muted); margin-top:4px;}
-  .chip{display:inline-block; font-size:10.5px; font-weight:700; padding:2px 8px; border-radius:10px; margin-top:6px;}
-  .chip.good{background:#e9f7ef; color:#1e7a45;}
-  .chip.bad{background:#fdeef4; color:#b02a63;}
-  .chip.flat{background:var(--lbgray); color:var(--muted);}
+  .kpi .sub{font-size:12px; color:var(--muted); margin-top:4px;}
+  .kpi-subrow{display:flex; gap:14px; margin-top:14px; padding-top:14px; border-top:1px solid var(--border);}
+  .kpi-subrow .subitem{flex:1;}
+  .kpi-subrow .subitem .sublabel{font-size:10.5px; color:var(--muted); font-weight:700; text-transform:uppercase; letter-spacing:.3px;}
+  .kpi-subrow .subitem .subvalue{font-size:20px; font-weight:800; margin-top:2px;}
+  .kpi-subrow .subitem .subnote{font-size:10.5px; color:var(--muted); margin-top:2px;}
 
   .section-title{font-size:16px; font-weight:800; color:var(--dark-blue); margin:34px 0 4px;}
   .section-sub{font-size:12.5px; color:var(--muted); margin-bottom:16px; line-height:1.5;}
-  .section-sub b{color:var(--ink);}
 
   .funnel-wrap{background:var(--card-bg); border:1px solid var(--border); border-radius:14px; padding:26px 30px; display:flex; gap:34px; align-items:center; flex-wrap:wrap;}
   .funnel-stages{display:flex; flex-direction:column; gap:10px; flex:1; min-width:320px;}
@@ -50,12 +48,12 @@
   .divider{height:1px; background:var(--border); margin:14px 0;}
 
   .grid2{display:grid; grid-template-columns:1fr 1fr; gap:18px;}
-  .grid2x2{display:grid; grid-template-columns:1fr 1fr; gap:18px;}
+  .grid3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:18px;}
   .card{background:var(--card-bg); border:1px solid var(--border); border-radius:14px; padding:20px 22px 12px;}
   .card h3{margin:0 0 2px; font-size:14.5px; color:var(--dark-blue); font-weight:800;}
   .card .desc{font-size:12px; color:var(--muted); margin-bottom:12px;}
   .chart-box{position:relative; height:280px;}
-  .chart-box.tall{height:340px;}
+  .chart-box.tall{height:330px;}
   .full{grid-column:1/-1;}
 
   .callout{background:#fff7fb; border:1px solid #f6d3e6; border-radius:12px; padding:16px 20px; font-size:13px; color:#5a2540; margin-top:16px; line-height:1.5;}
@@ -63,300 +61,198 @@
   .caveat{background:#fff8e8; border:1px solid #f2dfa8; border-radius:12px; padding:16px 20px; font-size:13px; color:#6b5320; margin-top:16px; line-height:1.5;}
   .caveat b{color:#a9781a;}
 
+  .insight-item{display:flex; gap:14px; padding:14px 0; border-bottom:1px solid var(--border);}
+  .insight-item:last-child{border-bottom:none;}
+  .insight-item .tag{flex-shrink:0; width:88px; text-align:center; height:26px; line-height:26px; border-radius:13px; font-size:10.5px; font-weight:800; text-transform:uppercase; letter-spacing:.3px; color:#fff;}
+  .insight-item .tag.watch{background:var(--magenta);}
+  .insight-item .tag.act{background:#e8622c;}
+  .insight-item .tag.good{background:var(--lime);}
+  .insight-item .body{flex:1; font-size:13px; line-height:1.5; color:var(--ink);}
+  .insight-item .body b{color:var(--dark-blue);}
+
   .data-table{width:100%; border-collapse:collapse; font-size:13px;}
   .data-table th{text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:.3px; color:var(--muted); font-weight:700; padding:10px 12px; border-bottom:2px solid var(--border);}
   .data-table td{padding:11px 12px; border-bottom:1px solid var(--border);}
   .data-table td.num, .data-table th.num{text-align:right; font-variant-numeric:tabular-nums;}
-  .data-table tr:last-child td{font-weight:800; background:var(--lbgray);}
-  .data-table.no-total tr:last-child td{font-weight:400; background:transparent;}
-  .data-table.no-total tr:last-child:hover td{background:#fafbfd;}
+  .data-table tr:last-child td{border-bottom:none; font-weight:800; background:var(--lbgray);}
+  .data-table.no-total tr:last-child td{border-bottom:1px solid var(--border); font-weight:400; background:transparent;}
+  .data-table.no-total tr:hover td{background:#fafbfd;}
   .data-table tr:hover td{background:#fafbfd;}
   .data-table tr:last-child:hover td{background:var(--lbgray);}
+  .data-table.no-total tr:last-child:hover td{background:#fafbfd;}
+
+  .unassigned-callout{background:var(--card-bg); border:1px solid var(--border); border-left:4px solid #e8622c; border-radius:12px; padding:16px 18px; max-width:340px; margin-bottom:18px;}
+  .unassigned-callout .label{font-size:11px; color:var(--muted); font-weight:700; text-transform:uppercase; letter-spacing:.4px;}
+  .unassigned-callout .value{font-size:30px; font-weight:800; margin-top:6px; color:#e8622c;}
+  .unassigned-callout .sub{font-size:11.5px; color:var(--muted); margin-top:4px;}
 
   footer{padding:20px 40px 40px; text-align:center; color:var(--muted); font-size:11.5px;}
-  @media(max-width:1100px){ .kpi-grid{grid-template-columns:repeat(2,1fr);} .grid2, .grid2x2{grid-template-columns:1fr;} }
+  @media(max-width:1100px){ .kpi-grid{grid-template-columns:repeat(2,1fr);} .grid2, .grid3{grid-template-columns:1fr;} }
 </style>
 </head>
 <body>
 
 <header>
   <h1>TI Lead Generation Dashboard — July 2026</h1>
-  <p>Leads first seen in July 2026 &middot; spam/test/internal removed &middot; channel &amp; funnel per TI methodology</p>
   <div class="badge-row">
-    <div class="badge"><strong>29</strong> new unique leads &middot; 31 total submissions</div>
-    <div class="badge down" id="momBadge">&#9660; -11.4% total submissions vs June (35 &rarr; 31)</div>
+    <div class="badge"><strong>35</strong> new unique leads (37 total form/ad submissions)</div>
+    <div class="badge up">&#9650; 5.7% vs June (35 &rarr; 37)</div>
   </div>
 </header>
 
 <main>
 
   <div class="kpi-grid">
-    <div class="kpi c1"><div class="label">New Unique Leads</div><div class="value">29</div><div class="sub">31 total submissions</div><span class="chip flat">&#8212; flat vs June (29)</span></div>
-    <div class="kpi c2"><div class="label">MQL</div><div class="value">16</div><div class="sub">55.2% of July leads</div><span class="chip good">&#9650; 9 vs June (7)</span></div>
-    <div class="kpi c3"><div class="label">SQL Total</div><div class="value">13</div><div class="sub">44.8% of July leads</div><span class="chip bad">&#9660; 9 vs June (22)</span></div>
-    <div class="kpi c4"><div class="label">SQL via Contact Form</div><div class="value">11</div><div class="sub">Auto-100 on demo submit</div><span class="chip bad">&#9660; 9 vs June (20)</span></div>
-    <div class="kpi c5"><div class="label">SQL via Engagement Score</div><div class="value">2</div><div class="sub">Score &ge;100, no form fill</div><span class="chip flat">&#8212; flat vs June (2)</span></div>
+    <div class="kpi c1"><div class="label">New Unique Leads</div><div class="value">35</div><div class="sub">37 total submissions</div></div>
+    <div class="kpi c2"><div class="label">MQL</div><div class="value">16</div><div class="sub">45.7% of July leads</div></div>
+    <div class="kpi c3">
+      <div class="label">SQL Total</div><div class="value">12</div><div class="sub">34.3% of July leads</div>
+      <div class="kpi-subrow">
+        <div class="subitem">
+          <div class="sublabel" style="color:var(--lime)">Via Contact Form</div>
+          <div class="subvalue" style="color:var(--lime)">10</div>
+          <div class="subnote">Auto-scored 100pts on submit</div>
+        </div>
+        <div class="subitem">
+          <div class="sublabel" style="color:var(--magenta)">Via Engagement Score</div>
+          <div class="subvalue" style="color:var(--magenta)">2</div>
+          <div class="subnote">No form fill</div>
+        </div>
+      </div>
+    </div>
   </div>
+  <div class="section-sub" style="margin-top:-16px; margin-bottom:26px;"><i>Note: MQL (16) + SQL (12) = 28 of the 35 new leads. The remaining <b>7</b> are LinkedIn-origin leads found in a reconciliation against the raw LinkedIn ad-platform export (not yet synced into Pardot) and are marked <b>Unscored &ndash; Pending Pardot Sync</b> rather than guessed into MQL/SQL.</i></div>
 
   <div class="section-title">July Form Fill Breakdown</div>
-  <div class="section-sub">Unique people by form type, after removing spam/test/internal entries and deduping repeat submitters.</div>
+  <div class="section-sub">Unique people, by form type &mdash; after removing spam/test/internal entries and deduping repeat submitters.</div>
   <div class="card full" style="padding:8px 22px 4px;">
     <table class="data-table">
-      <thead><tr><th>Form Type</th><th class="num">June</th><th class="num">July</th><th class="num">MoM</th></tr></thead>
-      <tbody><tr><td>Contact Form (demo request — combined)</td><td class="num">22</td><td class="num"><b>11</b></td><td class="num"><span class="chip bad">&#9660; 11</span></td></tr>
-<tr><td>Leadership Webform (gated resource)</td><td class="num">9</td><td class="num"><b>12</b></td><td class="num"><span class="chip good">&#9650; 3</span></td></tr>
-<tr><td>LinkedIn (Paid Social) Ad Lead Gen Form</td><td class="num">1</td><td class="num"><b>7</b></td><td class="num"><span class="chip good">&#9650; 6</span></td></tr>
-<tr><td>TOTAL</td><td class="num">32</td><td class="num">30</td><td class="num"><span class="chip bad">&#9660; 2</span></td></tr>
+      <thead><tr><th>Form Type</th><th class="num">Unique Submissions</th></tr></thead>
+      <tbody><tr><td>Contact Form (demo request — combined)</td><td class="num">10</td></tr>
+<tr><td>Leadership Webform (gated resource)</td><td class="num">12</td></tr>
+<tr><td>LinkedIn (Paid Social) Ad Lead Gen Form</td><td class="num">14</td></tr>
+<tr><td>TOTAL</td><td class="num">36</td></tr>
 </tbody>
     </table>
   </div>
-  <div class="callout">Contact Form combines the two demo-request forms (generic: <b>6</b>, dynamic: <b>5</b>). 1 lead(s) submitted more than once in July (consultant_harris@tenvie.com). 1 July submitter(s) first touched in a prior month (jennifer.ralph@sprim.net), so they're counted in submissions but not in the new-lead cohort.</div>
+  <div class="callout"><b>36 unique people</b> submitted a form or LinkedIn ad lead in July across these three form types.</div>
 
 
   <div class="section-title">July Form Fills by Service Line</div>
-  <div class="section-sub">Transcribed from TI's service-line segmentation tracker (screenshot-confirmed). <b>Summits</b> is a separate event/registration line outside the demo-form funnel — no Summits row was visible in this run's screenshots, so it is treated as zero and flagged rather than assumed.</div>
+  <div class="section-sub">From the service-line tracker (screenshot-confirmed). <b>Note:</b> shown as Sales-form vs. Resource-form,
+    not SQL vs. MQL &mdash; our Pardot data's own "Service Line" field uses a different, brand-level taxonomy (Trial Interactive /
+    Translation Services / Unknown, ~50% populated) that doesn't map to TI's actual service lines, so a true SQL/MQL-by-service-line
+    breakdown isn't buildable from real data yet. This keeps the same real tracker numbers as the primary dashboard.</div>
   <div class="grid2">
-    <div class="card"><h3>Sales Form Fills by Service Line</h3><div class="desc">July &middot; demo-request forms &middot; 10 total <span class="chip bad">&#9660; 14 vs June (24)</span></div><div class="chart-box"><canvas id="salesSvc"></canvas></div></div>
-    <div class="card"><h3>Resource Form Fills by Service Line</h3><div class="desc">July &middot; leadership webform &middot; 12 total <span class="chip good">&#9650; 3 vs June (9)</span></div><div class="chart-box"><canvas id="resSvc"></canvas></div></div>
+    <div class="card"><h3>Sales Form Fills by Service Line</h3><div class="desc">July &middot; 24 total</div><div class="chart-box"><canvas id="salesServiceLineChart"></canvas></div></div>
+    <div class="card"><h3>Resource Form Fills by Service Line</h3><div class="desc">July &middot; 12 total</div><div class="chart-box"><canvas id="resourceServiceLineChart"></canvas></div></div>
   </div>
-  <div class="caveat"><b>Summits caveat &amp; sanity check:</b> Summits = 0 this month (no Summits row visible in the tracker screenshots; flagged for confirmation with the tracker owner rather than assumed accurate). Sales-side total excl. Summits (10) vs. July's combined demo-contact unique leads (11) — consistent, small gap from repeat/overlap submitters.
-  <b>MoM note:</b> June service-line totals (Sales 24, Resource 9) are transcribed from the tracker screenshot — please verify: Sales June = eClinical / multiple products: 16, eTMF: 1, CTMS: 2, eISF: 1, Other: 4; Resource June = TI General: 2, eClinical / multiple products: 5, AI / ML: 2.
-  <b>Also flagged:</b> re-transcribing the tracker this run produced a different May total than what June's dashboard reported (May Sales was previously recorded as 30; this run's screenshot reads 27, driven by a TMF value that now shows blank for May vs. 3 previously) — the tracker itself appears to have been edited since last month's run. Using this run's screenshot as the source of truth per the "attached files are the only source of truth" rule.</div>
 
   <div class="section-title">July Funnel: New Leads &rarr; MQL &rarr; SQL</div>
-  <div class="section-sub">Based on the 29 unique people whose first-ever touch happened in July.</div>
+  <div class="section-sub">Based on unique people whose first-ever touch (form fill or LinkedIn ad lead) happened in July.</div>
   <div class="funnel-wrap">
-    <div class="funnel-stages"><div class="fstage"><div class="bar" style="width:100.0%; background:#003b71;"><span>New Leads</span><span>29</span></div><div class="meta">100% of July cohort</div></div><div class="fstage"><div class="bar" style="width:55.172413793103445%; background:#139dd8;"><span>MQL</span><span>16</span></div><div class="meta">55% of July leads</div></div><div class="fstage"><div class="bar" style="width:44.827586206896555%; background:#ec388a;"><span>SQL</span><span>13</span></div><div class="meta">45% of July leads</div></div></div>
+    <div class="funnel-stages"><div class="fstage"><div class="bar" style="width:100.0%; background:#003b71;"><span>New Leads</span><span>35</span></div><div class="meta">100% of July cohort</div></div><div class="fstage"><div class="bar" style="width:45.714285714285715%; background:#139dd8;"><span>MQL</span><span>16</span></div><div class="meta">46% of July leads</div></div><div class="fstage"><div class="bar" style="width:34.285714285714285%; background:#ec388a;"><span>SQL</span><span>12</span></div><div class="meta">34% of July leads</div></div></div>
     <div class="funnel-side">
       <div style="font-size:13px;font-weight:800;color:var(--dark-blue);margin-bottom:12px;">How July leads reached SQL status</div>
-      <div class="split-row"><div class="dot" style="background:var(--lime)"></div><div class="txt">Contact Form Fill (deterministic, instant)</div><div class="num">11</div></div>
-      <div class="split-row"><div class="dot" style="background:var(--magenta)"></div><div class="txt">Score-Qualified (score &ge;100, no form fill)</div><div class="num">2</div></div>
-      <div class="divider"></div>
-      <div class="split-row"><div class="dot" style="background:var(--dark-blue)"></div><div class="txt">SQL Total</div><div class="num">13</div></div>
-      <div class="divider"></div>
-      <div style="font-size:12px;color:var(--muted);line-height:1.7;"><b>vs June cohort:</b> New <span class="chip flat">&#8212; flat vs June (29)</span> &middot; MQL <span class="chip good">&#9650; 9 vs June (7)</span> &middot; SQL <span class="chip bad">&#9660; 9 vs June (22)</span></div>
+      <div class="split-row"><div class="dot" style="background:var(--teal)"></div><div class="txt">Contact Form Fill (deterministic, instant)</div><div class="num">10</div></div>
+      <div class="split-row"><div class="dot" style="background:var(--magenta)"></div><div class="txt">Score-Qualified (accumulated engagement, no form fill)</div><div class="num">2</div></div>
+      <div class="split-row"><div class="dot" style="background:#c7ccd4"></div><div class="txt">Unscored (pending Pardot sync)</div><div class="num">7</div></div>
     </div>
   </div>
 
-
   <div class="section-title">Which Engagement Types Lead to a Contact Form? (July cohort)</div>
-  <div class="section-sub">Of July's non-demo-origin leads (resource downloads, LinkedIn ad leads, nurture touches), how many later filled a demo-request form anywhere in the dataset? <b>MoM:</b> July has 18 non-demo-origin leads vs 9 in June; neither cohort has converted any to a demo form yet.</div>
+  <div class="section-sub">Of July's passive-entry leads (resource downloads, LinkedIn ad leads, nurture-email touches), how many circled back and filled a contact form within the data window?</div>
   <div class="funnel-wrap" style="align-items:stretch;">
     <div style="flex:1; min-width:220px; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; border-right:1px solid var(--border); padding-right:24px;">
       <div style="font-size:44px; font-weight:800; color:var(--magenta);">0</div>
-      <div style="font-size:13px; color:var(--muted); margin-top:4px;">out of 18 July non-demo-origin leads later filled a contact form</div>
+      <div style="font-size:13px; color:var(--muted); margin-top:4px;">out of 25 July MQL-origin leads later filled a contact form</div>
     </div>
     <div class="funnel-side" style="flex:2;">
-      <div class="split-row"><div class="dot" style="background:var(--lime)"></div><div class="txt">Started via Gated Resource (leadership) download</div><div class="num">0 of 11</div></div>
-      <div class="split-row"><div class="dot" style="background:var(--light-blue2)"></div><div class="txt">Started via LinkedIn (Paid Social) ad lead</div><div class="num">0 of 7</div></div>
-      <div class="split-row"><div class="dot" style="background:var(--teal)"></div><div class="txt">Ever had a Pardot/Act-On-email-attributed touch</div><div class="num">0 of 0</div></div>
+      <div class="split-row"><div class="dot" style="background:var(--lime)"></div><div class="txt">Started via Gated Resource download</div><div class="num">0 of 11</div></div>
+      <div class="split-row"><div class="dot" style="background:var(--light-blue2)"></div><div class="txt">Started via LinkedIn Ad lead</div><div class="num">0 of 14</div></div>
+      <div class="split-row"><div class="dot" style="background:var(--teal)"></div><div class="txt">Ever had a nurture-email-attributed touch</div><div class="num">0 of 0</div></div>
       <div class="divider"></div>
-      <div style="font-size:12px;color:var(--muted);line-height:1.5;">None of July's non-demo-origin leads had progressed to a demo-request form within the available data. Note the LinkedIn-origin cohort jumped from 1 in June to 7 this month — worth revisiting this cohort in future months once they've had more time to re-engage.</div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.5;">A recent cohort &mdash; resource downloads and ad leads from earlier in the year needed weeks to convert on the rare occasions they did. Worth revisiting this specific group again in August/September once they've had more time to re-engage.</div>
     </div>
   </div>
+
 
   <div class="section-title">Channel Performance — July</div>
-  <div class="section-sub">Lead share and trailing 7-month trends (new-lead cohort, first-touch channel). Trend reflects full Jan&ndash;Jul history; July is not the lowest month in the window — Jun is.<br><span class="chip bad" style="margin-right:6px;">AI Referral (ChatGPT): 1 &#9660; 1 (June 2)</span><span class="chip good" style="margin-right:6px;">Google Ads (Paid Search): 6 &#9650; 4 (June 2)</span><span class="chip good" style="margin-right:6px;">LinkedIn (Paid Social): 7 &#9650; 6 (June 1)</span><span class="chip bad" style="margin-right:6px;">Pardot Email: 0 &#9660; 1 (June 1)</span><span class="chip bad" style="margin-right:6px;">Unattributed: 15 &#9660; 8 (June 23)</span></div>
-  <div class="grid2x2">
-    <div class="card"><h3>Lead Share by Channel</h3><div class="desc">% of July new leads</div><div class="chart-box"><canvas id="donut"></canvas></div></div>
-    <div class="card"><h3>Total New Leads — July in Context</h3><div class="desc">Jan&ndash;Jul, July highlighted</div><div class="chart-box"><canvas id="trendTotal"></canvas></div></div>
-    <div class="card"><h3>Google Ads — July in Context</h3><div class="desc">Jan&ndash;Jul, July highlighted</div><div class="chart-box"><canvas id="trendGads"></canvas></div></div>
-    <div class="card"><h3>LinkedIn (Paid Social) — July in Context</h3><div class="desc">Jan&ndash;Jul, July highlighted</div><div class="chart-box"><canvas id="trendLi"></canvas></div></div>
+  <div class="grid2">
+    <div class="card"><h3>Lead Share by Channel</h3><div class="desc">% of July submissions</div><div class="chart-box"><canvas id="channelDonutChart"></canvas></div></div>
+    <div class="card"><h3>July in Context: 7-Month Trend</h3><div class="desc">Total leads by month, Jan&ndash;Jul (July highlighted)</div><div class="chart-box"><canvas id="trendChart"></canvas></div></div>
+  </div>
+  <div class="grid3" style="margin-top:18px;">
+    <div class="card"><h3>Google Ads: July in Context</h3><div class="desc">Google Ads leads by month, Jan&ndash;Jul (July highlighted)</div><div class="chart-box"><canvas id="googleTrendChart"></canvas></div></div>
+    <div class="card"><h3>LinkedIn Ads: July in Context</h3><div class="desc">LinkedIn Ads leads by month, Jan&ndash;Jul (July highlighted)</div><div class="chart-box"><canvas id="linkedinTrendChart"></canvas></div></div>
+    <div class="card"><h3>Email Nurture vs. Blast: July in Context</h3><div class="desc">By month, Jan&ndash;Jul</div><div class="chart-box"><canvas id="emailTrendChart"></canvas></div></div>
   </div>
 
 
-  <div class="section-title">Which Channels Drove July's SQLs?</div>
-  <div class="section-sub">July's new unique leads by first-touch channel, stacked into MQL / SQL&ndash;Contact Form / SQL&ndash;Score Qualified. Sorted largest total first. <b>MoM:</b> SQL total <span class="chip bad">&#9660; 9 vs June (22)</span> &mdash; contact-form SQLs <span class="chip bad">&#9660; 9 vs June (20)</span>, score-qualified <span class="chip flat">&#8212; flat vs June (2)</span>.</div>
-  <div class="card full"><div class="chart-box tall"><canvas id="s8chart"></canvas></div></div>
-  <div class="callout"><b>Read with care:</b> July's SQLs convert predominantly via contact-form fill; no paid or organic channel shows an SQL-purely-via-score-with-zero-form-fills profile this month (the only score-only SQLs are ['Unattributed (No UTM)']).</div>
-
-  <div class="section-title">Which Channels Drove July's MQLs?</div>
-  <div class="section-sub">MQL count by first-touch channel, colored to match each channel's donut color. <b>MoM:</b> MQLs <span class="chip good">&#9650; 9 vs June (7)</span>.</div>
-  <div class="card full"><div class="chart-box"><canvas id="s9chart"></canvas></div></div>
+  <div class="section-title">What Channels Drove the Leads</div>
+  <div class="section-sub">July's new unique leads by first-touch channel, broken into MQL / SQL&ndash;via-form / SQL&ndash;via-score / Unscored.</div>
+  <div class="card full"><div class="chart-box tall"><canvas id="channelFunnelChart"></canvas></div></div>
 
   <div class="section-title">Engagement Score Distribution — July</div>
-  <div class="section-sub">Where July's new leads sit on the Pardot score scale (100 = SQL threshold). Blue below 100, magenta at/above. <b>MoM:</b> 13 of 29 July leads (45%) sit at &ge;100, vs 21 of 29 (72%) in June.</div>
-  <div class="card full"><div class="chart-box tall"><canvas id="scoreChart"></canvas></div></div>
+  <div class="section-sub">Where July's new leads currently sit on the Pardot score scale (100 = SQL threshold).</div>
+  <div class="card full"><div class="chart-box tall"><canvas id="scoreDistChart"></canvas></div></div>
 
-
-  <div class="section-title" style="margin-top:48px; font-size:18px;">Deeper Insights — YTD 2026</div>
-  <div class="section-sub">Derived from the full Jan&ndash;Jul dataset behind this dashboard. These views place July in context and surface where action is likely to pay off.</div>
-
-  <div class="section-title">Lead Quality Trend: SQL Rate by Monthly Cohort</div>
-  <div class="section-sub">Each month's new-lead cohort and the share that reached SQL. <b>Volume has hovered in the high-20s to high-40s all year (Jan 47 &rarr; July 29), but SQL rate has swung hard: it peaked at 81.6% in May then fell back to 44.8% in July — the sharpest single-month drop in the window, back near Jan/Mar's ~43% floor. July's flat lead volume masks a real quality pullback, not just a slow month.</b></div>
-  <div class="card full"><div class="chart-box tall"><canvas id="cohortChart"></canvas></div></div>
-
-  <div class="section-title">YTD Channel Quality Scorecard</div>
-  <div class="section-sub">All Jan&ndash;Jul leads by first-touch channel: volume, SQL conversion, and average max Pardot score.</div>
-  <div class="card full" style="padding:8px 22px 4px;">
-    <table class="data-table">
-      <thead><tr><th>Channel</th><th class="num">Leads (YTD)</th><th class="num">SQL</th><th class="num">SQL Rate</th><th class="num">Avg Max Score</th></tr></thead>
-      <tbody><tr><td>Unattributed (No UTM)</td><td class="num">150</td><td class="num">109</td><td class="num"><b>73%</b></td><td class="num">166</td></tr>
-<tr><td>LinkedIn (Paid Social)</td><td class="num">69</td><td class="num">6</td><td class="num"><b>9%</b></td><td class="num">57</td></tr>
-<tr><td>Google Ads (Paid Search)</td><td class="num">26</td><td class="num">22</td><td class="num"><b>85%</b></td><td class="num">118</td></tr>
-<tr><td>Pardot Email</td><td class="num">9</td><td class="num">6</td><td class="num"><b>67%</b></td><td class="num">271</td></tr>
-<tr><td>AI Referral (ChatGPT)</td><td class="num">7</td><td class="num">6</td><td class="num"><b>86%</b></td><td class="num">183</td></tr>
-<tr><td>TOTAL</td><td class="num">261</td><td class="num">149</td><td class="num">57%</td><td class="num">&mdash;</td></tr></tbody>
-    </table>
+  <div class="section-title">Newly Converted SQLs — Score 100&ndash;149 (July)</div>
+  <div class="section-sub">July leads who just crossed the SQL threshold &mdash; the freshest, most time-sensitive follow-up list. Includes leads that converted either by filling a contact form or by accumulating score, since both are real SQL status as of this month.</div>
+  <div class="unassigned-callout">
+    <div class="label">Unassigned in This List</div>
+    <div class="value">0</div>
+    <div class="sub">No assigned user found in the CRM</div>
   </div>
-  <div class="callout"><b>The budget question this raises:</b> Google Ads converts <b>85%</b> of its leads to SQL (22 of 26, avg score 118) while LinkedIn (Paid Social) converts <b>9%</b> (6 of 69, avg score 57 — the lowest of any channel). If spend is comparable across the two, this remains the single highest-impact reallocation candidate in the data. LinkedIn's value case would need to rest on audience/brand goals rather than pipeline.</div>
-
-  <div class="section-title">Do Gated Content &amp; LinkedIn Ads Ever Convert? (full-history view)</div>
-  <div class="section-sub">July's cohort showed 0 conversions to a demo form — but that could just mean the cohort is young. This view asks the same question across the <b>full available history (Dec 2025 &ndash; July 2026</b>; the LinkedIn Paid Social export reaches back to Dec 2025<b>)</b>.</div>
-  <div class="funnel-wrap" style="align-items:stretch;">
-    <div style="flex:1; min-width:260px;"><div style="margin-bottom:16px;">
-      <div class="split-row" style="margin-bottom:4px;"><div class="dot" style="background:var(--lime)"></div><div class="txt">Gated Resource (leadership) origin</div><div class="num">3 of 77</div></div>
-      <div style="height:8px;background:var(--lbgray);border-radius:4px;overflow:hidden;margin-left:21px;"><div style="height:100%;width:3.9%;background:var(--lime);"></div></div>
-      <div style="font-size:11px;color:var(--muted);margin-left:21px;margin-top:3px;">3.9% lifetime conversion to demo form</div></div><div style="margin-bottom:16px;">
-      <div class="split-row" style="margin-bottom:4px;"><div class="dot" style="background:var(--light-blue2)"></div><div class="txt">LinkedIn (Paid Social) ad origin</div><div class="num">0 of 80</div></div>
-      <div style="height:8px;background:var(--lbgray);border-radius:4px;overflow:hidden;margin-left:21px;"><div style="height:100%;width:1%;background:var(--light-blue2);"></div></div>
-      <div style="font-size:11px;color:var(--muted);margin-left:21px;margin-top:3px;">0.0% lifetime conversion to demo form</div></div><div style="margin-bottom:16px;">
-      <div class="split-row" style="margin-bottom:4px;"><div class="dot" style="background:var(--teal)"></div><div class="txt">Email-Pardot-email-touched (non-demo first)</div><div class="num">0 of 5</div></div>
-      <div style="height:8px;background:var(--lbgray);border-radius:4px;overflow:hidden;margin-left:21px;"><div style="height:100%;width:1%;background:var(--teal);"></div></div>
-      <div style="font-size:11px;color:var(--muted);margin-left:21px;margin-top:3px;">0.0% lifetime conversion to demo form</div></div></div>
-    <div class="funnel-side" style="flex:1.4;">
-      <div style="font-size:13px;font-weight:800;color:var(--dark-blue);margin-bottom:10px;">The 3 resource-origin leads that did convert</div>
-      <div style="font-size:12.5px; line-height:1.7; color:var(--ink);"><div>&bull; <b>bella.chen@adlainortye.com</b> — downloaded 2026-04-09, demo form 2026-04-09 (<b>0 days</b>)</div><div>&bull; <b>rb@ghres.com</b> — downloaded 2026-03-02, demo form 2026-03-18 (<b>16 days</b>)</div><div>&bull; <b>vgv@lilly.com</b> — downloaded 2026-01-14, demo form 2026-05-27 (<b>132 days</b>)</div></div>
-      <div class="divider"></div>
-      <div style="font-size:12px;color:var(--muted);line-height:1.5;">Conversion lag ranged from same-day to 132 days — when gated content does convert, it can take a full quarter. But the base rate is the headline: <b>gated downloads convert to demo requests ~3.9% of the time, and LinkedIn ad leads have converted 0.0% of the time</b> in the available history (Dec 2025 &ndash; July 2026). This is unchanged from last month — structural, not a young-cohort artifact.</div>
-    </div>
-  </div>
-
-  <div class="section-title">Warm Pipeline: High-Score MQLs With No Form Fill</div>
-  <div class="section-sub">Leads scoring 50&ndash;99 &mdash; engaged enough to be near the SQL threshold, but who never raised a hand. <b>66 such leads exist</b> across the full dataset; the ten highest-scoring are below. This is a ready-made list for targeted nurture or SDR outreach.</div>
-  <div class="card full" style="padding:8px 22px 4px;">
+  <div class="card full">
     <table class="data-table no-total">
-      <thead><tr><th>Lead</th><th class="num">Score</th><th>First Touch</th><th>First-Touch Channel</th></tr></thead>
-      <tbody><tr><td>francis.payumo@artbio.com</td><td class="num"><b>99</b></td><td>2026-01-14</td><td>LinkedIn (Paid Social)</td></tr>
-<tr><td>jessica.bache.hansen@vicorepharma.com</td><td class="num"><b>99</b></td><td>2026-05-18</td><td>Unattributed (No UTM)</td></tr>
-<tr><td>adiaz@alnylam.com</td><td class="num"><b>95</b></td><td>2025-12-15</td><td>LinkedIn (Paid Social)</td></tr>
-<tr><td>sevgin.gunes@occlutech.com</td><td class="num"><b>95</b></td><td>2026-02-09</td><td>Pardot Email</td></tr>
-<tr><td>tonynguyen@arsenalbio.com</td><td class="num"><b>92</b></td><td>2026-07-20</td><td>Unattributed (No UTM)</td></tr>
-<tr><td>susana.schmitz@uni-rostock.de</td><td class="num"><b>91</b></td><td>2026-03-06</td><td>Google Ads (Paid Search)</td></tr>
-<tr><td>liz.okeke@teleflex.com</td><td class="num"><b>88</b></td><td>2026-03-26</td><td>LinkedIn (Paid Social)</td></tr>
-<tr><td>gmatias@vectorb2b.com</td><td class="num"><b>82</b></td><td>2026-04-08</td><td>Unattributed (No UTM)</td></tr>
-<tr><td>nmalpartida@tech-res.com</td><td class="num"><b>81</b></td><td>2026-01-20</td><td>Pardot Email</td></tr>
-<tr><td>liujuan@juventas.cn</td><td class="num"><b>78</b></td><td>2026-06-26</td><td>Unattributed (No UTM)</td></tr>
+      <thead><tr><th>Name</th><th>Company</th><th class="num">Score</th><th>Path</th><th>Assigned To</th><th>Status</th></tr></thead>
+      <tbody><tr><td>Arantza Martin-Mateo</td><td>LEO Pharma</td><td class="num">113</td><td>Score Qualified</td><td>enma.thompson@transperfect.com</td><td style="color:#3bbfb5; font-weight:700;">New</td></tr>
+<tr><td>Björn Dr. Silkenstedt</td><td>LMU Klinikum</td><td class="num">101</td><td>Contact Form</td><td>claurie@transperfect.com</td><td style="color:#3bbfb5; font-weight:700;">Qualified</td></tr>
+<tr><td>Julia Brahy</td><td>Averto Medical</td><td class="num">101</td><td>Contact Form</td><td>denise.remick@transperfect.com</td><td style="color:#3bbfb5; font-weight:700;">Recycled</td></tr>
+<tr><td>Charlie Kundig</td><td>Hopkins Center of Acheivement, LLC.</td><td class="num">100</td><td>Contact Form</td><td>tristan.devine@transperfect.com</td><td style="color:#3bbfb5; font-weight:700;">In Process</td></tr>
+<tr><td>Dhaarmi Dhaarmi</td><td>Fides Biocare</td><td class="num">100</td><td>Contact Form</td><td>tristan.devine@transperfect.com</td><td style="color:#3bbfb5; font-weight:700;">In Process</td></tr>
+<tr><td>Irha Khalid</td><td>RxConnect</td><td class="num">100</td><td>Contact Form</td><td>tristan.devine@transperfect.com</td><td style="color:#3bbfb5; font-weight:700;">In Process</td></tr>
+<tr><td>Jaeyoung Choi</td><td>Silvia Health</td><td class="num">100</td><td>Contact Form</td><td>wdu@transperfect.com</td><td style="color:#3bbfb5; font-weight:700;">New</td></tr>
 </tbody>
     </table>
   </div>
 
+  <div class="section-title">Actionable Insights &amp; Learnings</div>
+  <div class="card full">
+    <div>
+      <div class="insight-item"><div class="tag watch">watch</div><div class="body"><b>LinkedIn Paid Social volume is back up</b> since we turned the Ads on in the LifeSciences account. To start running awareness/net new ads on the TI account.</div></div>
+      <div class="insight-item"><div class="tag watch">watch</div><div class="body"><b>Google Ads converted 6 leads in July (much like May)</b>, with a high number of leads coming from the CTMS and eCTD campaigns. Optimizations have been made on the account and we will be scaling back spend and channeling money into the high converting campaigns.</div></div>
+      <div class="insight-item"><div class="tag good">good</div><div class="body"><b>Google Ads UTM tracking is clean this month.</b> All 6 of July's Google Ads leads carry verifiable <code>utm_source=google&amp;utm_medium=cpc</code> tags (or a <code>gclid</code>) on their own landing page &mdash; the manual confirmed-leads list wasn't even needed to classify any of them this month. Their landing pages (CTMS, eCTD, quality-management-system, tmf-services) directly corroborate the campaign mix noted above.</div></div>
+      <div class="insight-item"><div class="tag watch">watch</div><div class="body"><b>SQL rate has fallen sharply for two months running.</b> May 66.0% &rarr; Jun 71.0% &rarr; Jul 34.3% &mdash; July's rate is now the lowest of the year even with July's lead volume having risen, not fallen. This is a quality/mix story, not a volume story.</div></div>
+      <div class="insight-item"><div class="tag good">good</div><div class="body"><b>Sales assignment coverage is 100% this month.</b> All 7 of July's leads scoring 100&ndash;149 already have an owner in the CRM &mdash; no gaps to route.</div></div>
+      <div class="insight-item"><div class="tag watch">watch</div><div class="body"><b>Passive-to-active conversion is still near zero, lifetime.</b> Across the full available history, gated-resource-origin leads convert to a contact form only <b>3.9%</b> of the time (3 of 77), and LinkedIn-ad-origin leads have converted <b>0.0%</b> of the time (0 of 109). This mirrors every prior month; the lack of a structured nurture program remains the most consistent gap in the funnel.</div></div>
+    </div>
+  </div>
 
-  <div class="section-title" style="margin-top:48px; font-size:18px;">Product Insights — Content &amp; Page Attribution</div>
-  <div class="section-sub"><b>Data limitations, stated up front:</b> (1) <b>YoY is not available</b> &mdash; the dataset begins Dec 2025/Jan 2026, so there is no prior-year July to compare against; comparisons here are MoM only. (2) Page-view journeys are not tracked, so "the page a lead visited immediately before converting" cannot be determined; the closest available signal is each converter's <b>first-touch landing page</b>, shown below.</div>
-  <div class="grid2">
-    <div class="card">
-      <h3>First-Touch Page of SQL Converters</h3>
-      <div class="desc">Landing page of each contact-form SQL's first-ever touch &middot; June vs July cohorts + YTD (Jan&ndash;Jul) &middot; top 15 by YTD</div>
-      <table class="data-table no-total" style="font-size:12px;">
-        <thead><tr><th>Page</th><th class="num">June</th><th class="num">July</th><th class="num">YTD</th></tr></thead>
-        <tbody><tr><td>/ (homepage)</td><td class="num">5</td><td class="num"><b>4</b></td><td class="num">27</td></tr>
-<tr><td>/contact</td><td class="num">1</td><td class="num"><b></b></td><td class="num">25</td></tr>
-<tr><td>/CTMS</td><td class="num">1</td><td class="num"><b>2</b></td><td class="num">8</td></tr>
-<tr><td>/etmf-tmf-solutions</td><td class="num">5</td><td class="num"><b></b></td><td class="num">7</td></tr>
-<tr><td>(none recorded)</td><td class="num"></td><td class="num"><b></b></td><td class="num">7</td></tr>
-<tr><td>/etmf-tmf-solutions/etmf</td><td class="num">3</td><td class="num"><b></b></td><td class="num">6</td></tr>
-<tr><td>/optimize-tmf-roadshow-2026</td><td class="num"></td><td class="num"><b></b></td><td class="num">5</td></tr>
-<tr><td>/eArchive</td><td class="num"></td><td class="num"><b>1</b></td><td class="num">4</td></tr>
-<tr><td>/eCTD-Submission-Solution</td><td class="num">1</td><td class="num"><b>1</b></td><td class="num">3</td></tr>
-<tr><td>/etmf-tmf-solutions/tmf-services</td><td class="num"></td><td class="num"><b>1</b></td><td class="num">2</td></tr>
-<tr><td>/eclinical-platform</td><td class="num"></td><td class="num"><b></b></td><td class="num">2</td></tr>
-<tr><td>/eClinical-platform-overview</td><td class="num"></td><td class="num"><b></b></td><td class="num">2</td></tr>
-<tr><td>/request-a-demo</td><td class="num"></td><td class="num"><b></b></td><td class="num">2</td></tr>
-<tr><td>/investigator-database</td><td class="num"></td><td class="num"><b></b></td><td class="num">2</td></tr>
-<tr><td>/eISF</td><td class="num">1</td><td class="num"><b></b></td><td class="num">2</td></tr>
-<tr><td style="color:var(--muted)">&hellip; 14 more pages</td><td class="num"></td><td class="num"></td><td class="num" style="color:var(--muted)">14</td></tr>
-</tbody>
+  <div class="section-title">Appendix: Service Line Breakdown (transcribed, July only)</div>
+  <div class="card full" style="margin-bottom:18px;">
+    <div class="grid2">
+      <table class="data-table">
+        <thead><tr><th>Sales &mdash; Service Line</th><th class="num">July</th></tr></thead>
+        <tbody><tr><td>TI General</td><td class="num">3</td></tr><tr><td>TMF</td><td class="num">1</td></tr><tr><td>eTMF</td><td class="num">17</td></tr><tr><td>CTMS</td><td class="num">2</td></tr><tr><td>eISF</td><td class="num">1</td></tr><tr><td>TOTAL</td><td class="num">24</td></tr></tbody>
       </table>
-    </div>
-    <div class="card">
-      <h3>Gated Content Assets — Downloads &amp; Current Stage</h3>
-      <div class="desc">Unique downloaders per asset (leadership webform) &middot; June vs July + YTD (Jan&ndash;Jul) &middot; (x/y) = downloaders now MQL / now SQL &middot; top 15 by YTD</div>
-      <table class="data-table no-total" style="font-size:12px;">
-        <thead><tr><th>Asset</th><th class="num">June (MQL/SQL)</th><th class="num">July (MQL/SQL)</th><th class="num">YTD (MQL/SQL)</th></tr></thead>
-        <tbody><tr><td style="word-break:break-all;">ich-e6r3-tmf-oversight-best-practices-ensuring-compliance-and-quality</td><td class="num"></td><td class="num">1 <span style="color:var(--muted)">(1/0)</span></td><td class="num">10 <span style="color:var(--muted)">(7/3)</span></td></tr>
-<tr><td style="word-break:break-all;">understanding-risk-based-capa</td><td class="num"></td><td class="num">1 <span style="color:var(--muted)">(1/0)</span></td><td class="num">9 <span style="color:var(--muted)">(7/2)</span></td></tr>
-<tr><td style="word-break:break-all;">surfacing-your-ctms-and-etmf-using-ai</td><td class="num"></td><td class="num">1 <span style="color:var(--muted)">(0/1)</span></td><td class="num">7 <span style="color:var(--muted)">(2/5)</span></td></tr>
-<tr><td style="word-break:break-all;">data-interoperability-enablement-adopting-end-end-clinical-systems-apac</td><td class="num">5 <span style="color:var(--muted)">(3/2)</span></td><td class="num">1 <span style="color:var(--muted)">(1/0)</span></td><td class="num">6 <span style="color:var(--muted)">(4/2)</span></td></tr>
-<tr><td style="word-break:break-all;">etmf-implementation-checklist</td><td class="num"></td><td class="num">2 <span style="color:var(--muted)">(2/0)</span></td><td class="num">5 <span style="color:var(--muted)">(4/1)</span></td></tr>
-<tr><td style="word-break:break-all;">ai-clinical-operations-where-it-actually-saves-30-60-days-and-where-it-doesnt</td><td class="num">2 <span style="color:var(--muted)">(2/0)</span></td><td class="num"></td><td class="num">4 <span style="color:var(--muted)">(3/1)</span></td></tr>
-<tr><td style="word-break:break-all;">beyond-surface-level-ai-deep-inspection-etmf-records-quality-compliance-0</td><td class="num"></td><td class="num"></td><td class="num">4 <span style="color:var(--muted)">(0/4)</span></td></tr>
-<tr><td style="word-break:break-all;">tmf-rescue-checklist-gap-analysis-and-remediate-strategies</td><td class="num"></td><td class="num"></td><td class="num">4 <span style="color:var(--muted)">(4/0)</span></td></tr>
-<tr><td style="word-break:break-all;">etmf-migration-download</td><td class="num"></td><td class="num"></td><td class="num">3 <span style="color:var(--muted)">(2/1)</span></td></tr>
-<tr><td style="word-break:break-all;">20250721_tmfmockinspection_internal_quality_review_checklist_v1.01.pdf</td><td class="num"></td><td class="num"></td><td class="num">3 <span style="color:var(--muted)">(1/2)</span></td></tr>
-<tr><td style="word-break:break-all;">(no asset link)</td><td class="num"></td><td class="num">1 <span style="color:var(--muted)">(1/0)</span></td><td class="num">2 <span style="color:var(--muted)">(1/1)</span></td></tr>
-<tr><td style="word-break:break-all;">1010</td><td class="num"></td><td class="num"></td><td class="num">2 <span style="color:var(--muted)">(2/0)</span></td></tr>
-<tr><td style="word-break:break-all;">mhra-inspection-insights</td><td class="num"></td><td class="num"></td><td class="num">2 <span style="color:var(--muted)">(1/1)</span></td></tr>
-<tr><td style="word-break:break-all;">mhra-inspection-insights-part-2-metrics-matter</td><td class="num"></td><td class="num"></td><td class="num">2 <span style="color:var(--muted)">(1/1)</span></td></tr>
-<tr><td style="word-break:break-all;">three-pillars-of-quality-management</td><td class="num">1 <span style="color:var(--muted)">(1/0)</span></td><td class="num"></td><td class="num">2 <span style="color:var(--muted)">(2/0)</span></td></tr>
-<tr><td style="color:var(--muted)">&hellip; 20 more assets</td><td class="num"></td><td class="num"></td><td class="num" style="color:var(--muted)">22 downloaders</td></tr>
-</tbody>
+      <table class="data-table">
+        <thead><tr><th>Resource &mdash; Service Line</th><th class="num">July</th></tr></thead>
+        <tbody><tr><td>TI General</td><td class="num">1</td></tr><tr><td>eClinical / multiple products</td><td class="num">1</td></tr><tr><td>TMF</td><td class="num">4</td></tr><tr><td>eTMF</td><td class="num">2</td></tr><tr><td>SSU</td><td class="num">1</td></tr><tr><td>LMS</td><td class="num">1</td></tr><tr><td>AI / ML</td><td class="num">2</td></tr><tr><td>TOTAL</td><td class="num">12</td></tr></tbody>
       </table>
-    </div>
-  </div>
-  <div class="callout"><b>What shifted MoM:</b> June's SQLs entered largely via product/solution pages (eTMF pages accounted for a large share, plus the homepage at 5). July's 11 contact-form SQLs shifted toward the homepage (4 of 11) and CTMS (2 of 11), with only 0 entering directly via /contact — and notably, fewer eTMF-labeled landing pages appear among July's SQL converters at all, a shift away from last month's TMF/eTMF-heavy entry pattern. On gated content, July's downloads were spread across 6 distinct assets with 1-2 downloaders each, topped by 'etmf-implementation-checklist' — a more fragmented pattern than June's concentration in a single popular webinar-type asset.</div>
-  <div class="section-sub" style="margin-top:8px;"><i>Note: the per-asset YTD downloader sum (87) exceeds the YTD unique-downloader total (78) because some people downloaded more than one distinct asset during the window and are counted once per asset.</i></div>
-
-
-  <div class="section-title" style="margin-top:48px; font-size:18px;">YTD Views — Jan&ndash;July 2026</div>
-  <div class="section-sub">7-month versions of three monthly views. Service-line values are transcribed from the YTD tracker screenshots.
-  <b>Reconciliation note:</b> the tracker screenshots provided this run showed only monthly columns, not the tracker's own running YTD-total column, so the "each service line's monthly values sum to the tracker's own YTD column" check specified in the methodology could not be performed this run &mdash; flagging as data unavailable rather than skipping silently.
-  <b>Known discrepancy vs. exports:</b> the tracker's Jan/Feb/Mar/Apr Sales totals (28/38/35/30) run well above the demo-form exports' unique counts for those months (12/18/11/17), while May/Jun/Jul reconcile reasonably well (27 vs 30/24 vs 22/10 vs 11) — the tracker appears to draw on additional early-month sources or counting rules. These charts faithfully show the <i>tracker's</i> numbers; the rest of the dashboard shows export-derived numbers.</div>
-
-  <div class="grid2">
-    <div class="card">
-      <h3>Sales Form Fills by Service Line — by Month</h3>
-      <div class="desc">Demo-request forms &middot; stacked by service line &middot; Jan&ndash;Jul</div>
-      <div class="chart-box tall"><canvas id="svcSalesMonthly"></canvas></div>
-    </div>
-    <div class="card">
-      <h3>Resource Form Fills by Service Line — by Month</h3>
-      <div class="desc">Leadership webform &middot; stacked by service line &middot; Jan&ndash;Jul</div>
-      <div class="chart-box tall"><canvas id="svcResMonthly"></canvas></div>
-    </div>
-  </div>
-
-  <div class="section-title">Which Engagement Types Lead to a Contact Form? (YTD cohort)</div>
-  <div class="section-sub">Same question as the July-cohort section above, asked of <b>all leads whose first touch was in 2026 (Jan&ndash;Jul)</b>: of those who entered via gated content or a LinkedIn ad, how many ever filled a demo-request form?</div>
-  <div class="funnel-wrap" style="align-items:stretch;">
-    <div style="flex:1; min-width:220px; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; border-right:1px solid var(--border); padding-right:24px;">
-      <div style="font-size:44px; font-weight:800; color:var(--magenta);">3</div>
-      <div style="font-size:13px; color:var(--muted); margin-top:4px;">of 146 YTD non-demo-origin leads later filled a contact form</div>
-    </div>
-    <div class="funnel-side" style="flex:2;"><div style="margin-bottom:16px;">
-      <div class="split-row" style="margin-bottom:4px;"><div class="dot" style="background:var(--lime)"></div><div class="txt">Started via Gated Resource (leadership) download</div><div class="num">3 of 77</div></div>
-      <div style="height:8px;background:var(--lbgray);border-radius:4px;overflow:hidden;margin-left:21px;"><div style="height:100%;width:3.9%;background:var(--lime);"></div></div>
-      <div style="font-size:11px;color:var(--muted);margin-left:21px;margin-top:3px;">3.9% YTD conversion to demo form</div></div><div style="margin-bottom:16px;">
-      <div class="split-row" style="margin-bottom:4px;"><div class="dot" style="background:var(--light-blue2)"></div><div class="txt">Started via LinkedIn (Paid Social) ad lead</div><div class="num">0 of 69</div></div>
-      <div style="height:8px;background:var(--lbgray);border-radius:4px;overflow:hidden;margin-left:21px;"><div style="height:100%;width:1%;background:var(--light-blue2);"></div></div>
-      <div style="font-size:11px;color:var(--muted);margin-left:21px;margin-top:3px;">0.0% YTD conversion to demo form</div></div><div style="margin-bottom:16px;">
-      <div class="split-row" style="margin-bottom:4px;"><div class="dot" style="background:var(--teal)"></div><div class="txt">Ever had a Pardot/Act-On-email-attributed touch</div><div class="num">0 of 5</div></div>
-      <div style="height:8px;background:var(--lbgray);border-radius:4px;overflow:hidden;margin-left:21px;"><div style="height:100%;width:1%;background:var(--teal);"></div></div>
-      <div style="font-size:11px;color:var(--muted);margin-left:21px;margin-top:3px;">0.0% YTD conversion to demo form</div></div></div>
-  </div>
-
-  <div class="grid2" style="margin-top:18px;">
-    <div class="card">
-      <h3>Lead Share by Channel — YTD</h3>
-      <div class="desc">All 2026 new leads (Jan&ndash;Jul) by first-touch channel</div>
-      <div class="chart-box"><canvas id="ytdDonut"></canvas></div>
-    </div>
-    <div class="card">
-      <h3>July vs YTD Channel Mix</h3>
-      <div class="desc">Share of new leads per channel, July cohort vs full YTD</div>
-      <div class="chart-box"><canvas id="ytdMixCompare"></canvas></div>
     </div>
   </div>
 
 </main>
 
-<footer>TI Marketing — July 2026 Lead Generation Snapshot &middot; Chart.js 4.4.1 &middot; scoped to leads first seen in July</footer>
+<footer>TI Marketing — July 2026 Lead Generation Snapshot &middot; Same data sources and methodology as the YTD dashboard, scoped to leads first seen in July</footer>
 
 <script>
 
-const D = {"meta": {"current": "July", "prior": "June", "year": 2026}, "kpi": {"new_unique": 29, "total_submissions": 31, "mql": 16, "sql_total": 13, "sql_cf": 11, "sql_sq": 2}, "prior_kpi": {"new_unique": 29, "total_submissions": 35, "mql": 7, "sql_total": 22, "sql_cf": 20, "sql_sq": 2}, "funnel": {"new": 29, "mql": 16, "sql": 13, "sql_cf": 11, "sql_sq": 2}, "form_breakdown": [{"form": "Contact Form (demo request \u2014 combined)", "n": 11, "prior": 22}, {"form": "Leadership Webform (gated resource)", "n": 12, "prior": 9}, {"form": "LinkedIn (Paid Social) Ad Lead Gen Form", "n": 7, "prior": 1}], "fb_meta": {"contact": 11, "generic": 6, "dynamic": 5, "contact_overlap": 0, "resource": 12, "social": 7, "total_subs": 31, "repeats": {"consultant_harris@tenvie.com": "2"}, "not_new": ["jennifer.ralph@sprim.net"]}, "donut": {"labels": ["Unattributed (No UTM)", "LinkedIn (Paid Social)", "Google Ads (Paid Search)", "AI Referral (ChatGPT)"], "values": [15, 7, 6, 1], "colors": ["#003b71", "#ec388a", "#139dd8", "#99cc33"]}, "trend": {"labels": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul"], "total": [47, 41, 37, 40, 38, 29, 29], "gads": [4, 1, 5, 2, 6, 2, 6], "li": [20, 15, 15, 8, 3, 1, 7]}, "chan_mom": {"current": {"Unattributed (No UTM)": 15, "LinkedIn (Paid Social)": 7, "Google Ads (Paid Search)": 6, "AI Referral (ChatGPT)": 1}, "prior": {"Unattributed (No UTM)": 23, "AI Referral (ChatGPT)": 2, "Google Ads (Paid Search)": 2, "Pardot Email": 1, "LinkedIn (Paid Social)": 1}}, "s8": {"labels": ["Unattributed (No UTM)", "LinkedIn (Paid Social)", "Google Ads (Paid Search)", "AI Referral (ChatGPT)"], "mql": [8, 7, 1, 0], "cf": [5, 0, 5, 1], "sq": [2, 0, 0, 0]}, "s9": {"labels": ["Unattributed (No UTM)", "LinkedIn (Paid Social)", "Google Ads (Paid Search)"], "values": [8, 7, 1], "colors": ["#003b71", "#ec388a", "#139dd8"]}, "score": {"labels": ["No Score", "25-49", "50-74", "75-99", "100-149", "150-199", "200-299", "300-499", "500+"], "values": [0, 5, 10, 1, 8, 0, 2, 1, 2], "prior_values": [1, 1, 4, 2, 12, 1, 6, 2, 0]}, "service": {"sales": {"labels": ["TI General", "TMF", "eTMF", "CTMS", "eISF"], "values": [3, 1, 3, 2, 1]}, "resource": {"labels": ["TI General", "eClinical / multiple products", "TMF", "eTMF", "SSU", "LMS", "AI / ML"], "values": [1, 1, 4, 2, 1, 1, 2]}}, "service_totals": {"sales_jul": 10, "sales_jun": 24, "res_jul": 12, "res_jun": 9}, "service_jun_nonzero": {"sales": {"eClinical / multiple products": 16, "eTMF": 1, "CTMS": 2, "eISF": 1, "Other": 4}, "resource": {"TI General": 2, "eClinical / multiple products": 5, "AI / ML": 2}}, "eng": {"current": {"headline_conv": 0, "headline_total": 18, "res_conv": 0, "res_total": 11, "li_conv": 0, "li_total": 7, "nur_conv": 0, "nur_total": 0}, "prior": {"headline_total": 9, "headline_conv": 0, "res_total": 8, "res_conv": 0, "li_total": 1, "li_conv": 0, "nur_total": 1, "nur_conv": 0}}, "insights": {"cohort_eff": [{"m": "Jan", "new": 47, "sql": 20, "rate": 42.6}, {"m": "Feb", "new": 41, "sql": 25, "rate": 61.0}, {"m": "Mar", "new": 37, "sql": 16, "rate": 43.2}, {"m": "Apr", "new": 40, "sql": 22, "rate": 55.0}, {"m": "May", "new": 38, "sql": 31, "rate": 81.6}, {"m": "Jun", "new": 29, "sql": 22, "rate": 75.9}, {"m": "Jul", "new": 29, "sql": 13, "rate": 44.8}], "channel_quality": [{"channel": "Unattributed (No UTM)", "leads": 150, "sql": 109, "rate": 73, "avg_score": 166}, {"channel": "LinkedIn (Paid Social)", "leads": 69, "sql": 6, "rate": 9, "avg_score": 57}, {"channel": "Google Ads (Paid Search)", "leads": 26, "sql": 22, "rate": 85, "avg_score": 118}, {"channel": "Pardot Email", "leads": 9, "sql": 6, "rate": 67, "avg_score": 271}, {"channel": "AI Referral (ChatGPT)", "leads": 7, "sql": 6, "rate": 86, "avg_score": 183}], "lifetime": {"res_total": 77, "res_conv": 3, "li_total": 80, "li_conv": 0, "nur_total": 5, "nur_conv": 0, "examples": [{"email": "bella.chen@adlainortye.com", "first": "2026-04-09", "contact": "2026-04-09", "days": 0}, {"email": "rb@ghres.com", "first": "2026-03-02", "contact": "2026-03-18", "days": 16}, {"email": "vgv@lilly.com", "first": "2026-01-14", "contact": "2026-05-27", "days": 132}]}, "warm": {"total": 66, "top": [{"email": "francis.payumo@artbio.com", "score": 99.0, "first": "2026-01-14", "channel": "LinkedIn (Paid Social)"}, {"email": "jessica.bache.hansen@vicorepharma.com", "score": 99.0, "first": "2026-05-18", "channel": "Unattributed (No UTM)"}, {"email": "adiaz@alnylam.com", "score": 95.0, "first": "2025-12-15", "channel": "LinkedIn (Paid Social)"}, {"email": "sevgin.gunes@occlutech.com", "score": 95.0, "first": "2026-02-09", "channel": "Pardot Email"}, {"email": "tonynguyen@arsenalbio.com", "score": 92.0, "first": "2026-07-20", "channel": "Unattributed (No UTM)"}, {"email": "susana.schmitz@uni-rostock.de", "score": 91.0, "first": "2026-03-06", "channel": "Google Ads (Paid Search)"}, {"email": "liz.okeke@teleflex.com", "score": 88.0, "first": "2026-03-26", "channel": "LinkedIn (Paid Social)"}, {"email": "gmatias@vectorb2b.com", "score": 82.0, "first": "2026-04-08", "channel": "Unattributed (No UTM)"}, {"email": "nmalpartida@tech-res.com", "score": 81.0, "first": "2026-01-20", "channel": "Pardot Email"}, {"email": "liujuan@juventas.cn", "score": 78.0, "first": "2026-06-26", "channel": "Unattributed (No UTM)"}]}}, "product": {"sql_pages": {"top15": [["/ (homepage)", 27], ["/contact", 25], ["/CTMS", 8], ["/etmf-tmf-solutions", 7], ["(none recorded)", 7], ["/etmf-tmf-solutions/etmf", 6], ["/optimize-tmf-roadshow-2026", 5], ["/eArchive", 4], ["/eCTD-Submission-Solution", 3], ["/etmf-tmf-solutions/tmf-services", 2], ["/eclinical-platform", 2], ["/eClinical-platform-overview", 2], ["/request-a-demo", 2], ["/investigator-database", 2], ["/eISF", 2]], "rest_sum": 14, "rest_n": 14, "jun": {"/etmf-tmf-solutions": 5, "/ (homepage)": 5, "/etmf-tmf-solutions/etmf": 3, "/contact": 1, "/blog/what-your-monitoring-reports-are-already-telling-you-and-why-no-one-listening": 1, "/optimize-2026": 1, "/eISF": 1, "/CTMS": 1, "/eCTD-Submission-Solution": 1, "/blog/ctms-integration": 1}, "jul": {"/ (homepage)": 4, "/CTMS": 2, "/eArchive": 1, "/eCTD-Submission-Solution": 1, "/quality-management-system": 1, "/etmf-tmf-solutions/tmf-inspection-readiness/tmf-experts": 1, "/etmf-tmf-solutions/tmf-services": 1}, "rows": [{"page": "/ (homepage)", "prior": 5, "current": 4, "ytd": 27}, {"page": "/contact", "prior": 1, "current": 0, "ytd": 25}, {"page": "/CTMS", "prior": 1, "current": 2, "ytd": 8}, {"page": "/etmf-tmf-solutions", "prior": 5, "current": 0, "ytd": 7}, {"page": "(none recorded)", "prior": 0, "current": 0, "ytd": 7}, {"page": "/etmf-tmf-solutions/etmf", "prior": 3, "current": 0, "ytd": 6}, {"page": "/optimize-tmf-roadshow-2026", "prior": 0, "current": 0, "ytd": 5}, {"page": "/eArchive", "prior": 0, "current": 1, "ytd": 4}, {"page": "/eCTD-Submission-Solution", "prior": 1, "current": 1, "ytd": 3}, {"page": "/etmf-tmf-solutions/tmf-services", "prior": 0, "current": 1, "ytd": 2}, {"page": "/eclinical-platform", "prior": 0, "current": 0, "ytd": 2}, {"page": "/eClinical-platform-overview", "prior": 0, "current": 0, "ytd": 2}, {"page": "/request-a-demo", "prior": 0, "current": 0, "ytd": 2}, {"page": "/investigator-database", "prior": 0, "current": 0, "ytd": 2}, {"page": "/eISF", "prior": 1, "current": 0, "ytd": 2}]}, "assets": {"top15": [["ich-e6r3-tmf-oversight-best-practices-ensuring-compliance-and-quality", {"jun": {"n": 0, "mql": 0, "sql": 0}, "jul": {"n": 1, "mql": 1, "sql": 0}, "ytd": {"n": 10, "mql": 7, "sql": 3}}], ["understanding-risk-based-capa", {"jun": {"n": 0, "mql": 0, "sql": 0}, "jul": {"n": 1, "mql": 1, "sql": 0}, "ytd": {"n": 9, "mql": 7, "sql": 2}}], ["surfacing-your-ctms-and-etmf-using-ai", {"jun": {"n": 0, "mql": 0, "sql": 0}, "jul": {"n": 1, "mql": 0, "sql": 1}, "ytd": {"n": 7, "mql": 2, "sql": 5}}], ["data-interoperability-enablement-adopting-end-end-clinical-systems-apac", {"jun": {"n": 5, "mql": 3, "sql": 2}, "jul": {"n": 1, "mql": 1, "sql": 0}, "ytd": {"n": 6, "mql": 4, "sql": 2}}], ["etmf-implementation-checklist", {"jun": {"n": 0, "mql": 0, "sql": 0}, "jul": {"n": 2, "mql": 2, "sql": 0}, "ytd": {"n": 5, "mql": 4, "sql": 1}}], ["ai-clinical-operations-where-it-actually-saves-30-60-days-and-where-it-doesnt", {"jun": {"n": 2, "mql": 2, "sql": 0}, "jul": {"n": 0, "mql": 0, "sql": 0}, "ytd": {"n": 4, "mql": 3, "sql": 1}}], ["beyond-surface-level-ai-deep-inspection-etmf-records-quality-compliance-0", {"jun": {"n": 0, "mql": 0, "sql": 0}, "jul": {"n": 0, "mql": 0, "sql": 0}, "ytd": {"n": 4, "mql": 0, "sql": 4}}], ["tmf-rescue-checklist-gap-analysis-and-remediate-strategies", {"jun": {"n": 0, "mql": 0, "sql": 0}, "jul": {"n": 0, "mql": 0, "sql": 0}, "ytd": {"n": 4, "mql": 4, "sql": 0}}], ["etmf-migration-download", {"jun": {"n": 0, "mql": 0, "sql": 0}, "jul": {"n": 0, "mql": 0, "sql": 0}, "ytd": {"n": 3, "mql": 2, "sql": 1}}], ["20250721_tmfmockinspection_internal_quality_review_checklist_v1.01.pdf", {"jun": {"n": 0, "mql": 0, "sql": 0}, "jul": {"n": 0, "mql": 0, "sql": 0}, "ytd": {"n": 3, "mql": 1, "sql": 2}}], ["(no asset link)", {"jun": {"n": 0, "mql": 0, "sql": 0}, "jul": {"n": 1, "mql": 1, "sql": 0}, "ytd": {"n": 2, "mql": 1, "sql": 1}}], ["1010", {"jun": {"n": 0, "mql": 0, "sql": 0}, "jul": {"n": 0, "mql": 0, "sql": 0}, "ytd": {"n": 2, "mql": 2, "sql": 0}}], ["mhra-inspection-insights", {"jun": {"n": 0, "mql": 0, "sql": 0}, "jul": {"n": 0, "mql": 0, "sql": 0}, "ytd": {"n": 2, "mql": 1, "sql": 1}}], ["mhra-inspection-insights-part-2-metrics-matter", {"jun": {"n": 0, "mql": 0, "sql": 0}, "jul": {"n": 0, "mql": 0, "sql": 0}, "ytd": {"n": 2, "mql": 1, "sql": 1}}], ["three-pillars-of-quality-management", {"jun": {"n": 1, "mql": 1, "sql": 0}, "jul": {"n": 0, "mql": 0, "sql": 0}, "ytd": {"n": 2, "mql": 2, "sql": 0}}]], "rest_sum": 22, "rest_n": 20, "rows": [{"asset": "ich-e6r3-tmf-oversight-best-practices-ensuring-compliance-and-quality", "prior": {"n": 0, "mql": 0, "sql": 0}, "current": {"n": 1, "mql": 1, "sql": 0}, "ytd": {"n": 10, "mql": 7, "sql": 3}}, {"asset": "understanding-risk-based-capa", "prior": {"n": 0, "mql": 0, "sql": 0}, "current": {"n": 1, "mql": 1, "sql": 0}, "ytd": {"n": 9, "mql": 7, "sql": 2}}, {"asset": "surfacing-your-ctms-and-etmf-using-ai", "prior": {"n": 0, "mql": 0, "sql": 0}, "current": {"n": 1, "mql": 0, "sql": 1}, "ytd": {"n": 7, "mql": 2, "sql": 5}}, {"asset": "data-interoperability-enablement-adopting-end-end-clinical-systems-apac", "prior": {"n": 5, "mql": 3, "sql": 2}, "current": {"n": 1, "mql": 1, "sql": 0}, "ytd": {"n": 6, "mql": 4, "sql": 2}}, {"asset": "etmf-implementation-checklist", "prior": {"n": 0, "mql": 0, "sql": 0}, "current": {"n": 2, "mql": 2, "sql": 0}, "ytd": {"n": 5, "mql": 4, "sql": 1}}, {"asset": "ai-clinical-operations-where-it-actually-saves-30-60-days-and-where-it-doesnt", "prior": {"n": 2, "mql": 2, "sql": 0}, "current": {"n": 0, "mql": 0, "sql": 0}, "ytd": {"n": 4, "mql": 3, "sql": 1}}, {"asset": "beyond-surface-level-ai-deep-inspection-etmf-records-quality-compliance-0", "prior": {"n": 0, "mql": 0, "sql": 0}, "current": {"n": 0, "mql": 0, "sql": 0}, "ytd": {"n": 4, "mql": 0, "sql": 4}}, {"asset": "tmf-rescue-checklist-gap-analysis-and-remediate-strategies", "prior": {"n": 0, "mql": 0, "sql": 0}, "current": {"n": 0, "mql": 0, "sql": 0}, "ytd": {"n": 4, "mql": 4, "sql": 0}}, {"asset": "etmf-migration-download", "prior": {"n": 0, "mql": 0, "sql": 0}, "current": {"n": 0, "mql": 0, "sql": 0}, "ytd": {"n": 3, "mql": 2, "sql": 1}}, {"asset": "20250721_tmfmockinspection_internal_quality_review_checklist_v1.01.pdf", "prior": {"n": 0, "mql": 0, "sql": 0}, "current": {"n": 0, "mql": 0, "sql": 0}, "ytd": {"n": 3, "mql": 1, "sql": 2}}, {"asset": "(no asset link)", "prior": {"n": 0, "mql": 0, "sql": 0}, "current": {"n": 1, "mql": 1, "sql": 0}, "ytd": {"n": 2, "mql": 1, "sql": 1}}, {"asset": "1010", "prior": {"n": 0, "mql": 0, "sql": 0}, "current": {"n": 0, "mql": 0, "sql": 0}, "ytd": {"n": 2, "mql": 2, "sql": 0}}, {"asset": "mhra-inspection-insights", "prior": {"n": 0, "mql": 0, "sql": 0}, "current": {"n": 0, "mql": 0, "sql": 0}, "ytd": {"n": 2, "mql": 1, "sql": 1}}, {"asset": "mhra-inspection-insights-part-2-metrics-matter", "prior": {"n": 0, "mql": 0, "sql": 0}, "current": {"n": 0, "mql": 0, "sql": 0}, "ytd": {"n": 2, "mql": 1, "sql": 1}}, {"asset": "three-pillars-of-quality-management", "prior": {"n": 1, "mql": 1, "sql": 0}, "current": {"n": 0, "mql": 0, "sql": 0}, "ytd": {"n": 2, "mql": 2, "sql": 0}}]}}, "ytd_views": {"months": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul"], "service_sales_monthly": {"TI General": [0, 0, 1, 5, 2, 0, 3], "eClinical / multiple products": [7, 8, 7, 9, 10, 16, 0], "TMF": [1, 3, 2, 0, 0, 0, 1], "eTMF": [16, 22, 24, 12, 0, 1, 3], "CTMS": [0, 1, 0, 3, 1, 2, 2], "SSU": [1, 1, 0, 1, 0, 0, 0], "eISF": [1, 0, 0, 0, 0, 1, 1], "eArchive": [0, 0, 0, 0, 0, 0, 0], "LMS": [1, 1, 1, 0, 0, 0, 0], "AI / ML": [0, 0, 0, 0, 0, 0, 0], "Summits": [0, 0, 0, 0, 0, 0, 0], "Other": [1, 2, 0, 0, 14, 4, 0]}, "service_resource_monthly": {"TI General": [8, 6, 6, 1, 3, 2, 1], "eClinical / multiple products": [3, 1, 2, 0, 0, 5, 1], "TMF": [4, 2, 0, 11, 1, 0, 4], "eTMF": [1, 0, 3, 3, 1, 0, 2], "CTMS": [0, 0, 0, 1, 0, 0, 0], "SSU": [0, 0, 0, 2, 0, 0, 1], "eISF": [0, 0, 0, 0, 0, 0, 0], "eArchive": [0, 0, 0, 0, 0, 0, 0], "LMS": [0, 0, 0, 0, 0, 0, 1], "AI / ML": [0, 4, 0, 0, 2, 2, 2], "Summits": [0, 0, 0, 0, 0, 0, 0], "Other": [2, 0, 0, 0, 0, 0, 0]}, "eng_ytd": {"res_total": 77, "res_conv": 3, "li_total": 69, "li_conv": 0, "nur_total": 5, "nur_conv": 0, "headline_total": 146, "headline_conv": 3}, "chan_ytd": {"labels": ["Unattributed (No UTM)", "LinkedIn (Paid Social)", "Google Ads (Paid Search)", "Pardot Email", "AI Referral (ChatGPT)"], "values": [150, 69, 26, 9, 7], "colors": ["#003b71", "#ec388a", "#139dd8", "#3bbfb5", "#99cc33"]}}};
+const D = {"meta": {"current": "July", "prior": "June", "year": 2026}, "kpi": {"new_unique": 35, "total_submissions": 37, "mql": 16, "sql_total": 12, "sql_cf": 10, "sql_sq": 2, "unscored": 7}, "prior_kpi": {"new_unique": 29, "total_submissions": 35, "mql": 7, "sql_total": 22, "sql_cf": 20, "sql_sq": 2}, "funnel": {"new": 35, "mql": 16, "sql": 12, "sql_cf": 10, "sql_sq": 2, "unscored": 7}, "form_breakdown": [{"form": "Contact Form (demo request \u2014 combined)", "n": 10, "prior": 22}, {"form": "Leadership Webform (gated resource)", "n": 12, "prior": 9}, {"form": "LinkedIn (Paid Social) Ad Lead Gen Form", "n": 14, "prior": 1}], "fb_meta": {"contact": 10, "generic": 5, "dynamic": 5, "contact_overlap": 0, "resource": 12, "social": 14, "total_subs": 37, "repeats": {"consultant_harris@tenvie.com": 2}, "not_new": ["jennifer.ralph@sprim.net"]}, "donut": {"labels": ["Unattributed (No UTM)", "LinkedIn (Paid Social)", "Google Ads (Paid Search)", "AI Referral (ChatGPT)"], "values": [14, 14, 6, 1], "colors": ["#003b71", "#ec388a", "#139dd8", "#99cc33"]}, "trend": {"labels": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul"], "total": [57, 41, 38, 40, 47, 31, 35], "gads": [4, 1, 5, 2, 6, 2, 6], "li": [30, 15, 16, 8, 12, 3, 14], "nurture": [0, 0, 1, 0, 0, 1, 0], "blast": [1, 5, 0, 0, 1, 0, 0]}, "chan_mom": {"current": {"Unattributed (No UTM)": 14, "LinkedIn (Paid Social)": 14, "Google Ads (Paid Search)": 6, "AI Referral (ChatGPT)": 1}, "prior": {"Unattributed (No UTM)": 23, "LinkedIn (Paid Social)": 3, "AI Referral (ChatGPT)": 2, "Google Ads (Paid Search)": 2, "Pardot Email": 1}}, "s8": {"labels": ["LinkedIn (Paid Social)", "Unattributed (No UTM)", "Google Ads (Paid Search)", "AI Referral (ChatGPT)"], "mql": [7, 8, 1, 0], "cf": [0, 4, 5, 1], "sq": [0, 2, 0, 0], "unscored": [7, 0, 0, 0]}, "s9": {"labels": ["Unattributed (No UTM)", "LinkedIn (Paid Social)", "Google Ads (Paid Search)"], "values": [8, 7, 1], "colors": ["#003b71", "#ec388a", "#139dd8"]}, "score": {"labels": ["No Score", "25-49", "50-74", "75-99", "100-149", "150-199", "200-299", "300-499", "500+"], "values": [7, 5, 10, 1, 7, 0, 2, 1, 2], "prior_values": [1, 1, 4, 2, 12, 1, 6, 2, 0]}, "service": {"sales": {"labels": ["TI General", "TMF", "eTMF", "CTMS", "eISF"], "values": [3, 1, 17, 2, 1]}, "resource": {"labels": ["TI General", "eClinical / multiple products", "TMF", "eTMF", "SSU", "LMS", "AI / ML"], "values": [1, 1, 4, 2, 1, 1, 2]}}, "service_totals": {"sales_jul": 24, "sales_jun": 27, "res_jul": 12, "res_jun": 9}, "service_jun_nonzero": {"sales": {"eClinical / multiple products": 17, "eTMF": 3, "CTMS": 2, "eISF": 1, "Other": 4}, "resource": {"TI General": 2, "eClinical / multiple products": 5, "AI / ML": 2}}, "eng": {"current": {"headline_conv": 0, "headline_total": 25, "res_conv": 0, "res_total": 11, "li_conv": 0, "li_total": 14, "nur_conv": 0, "nur_total": 0}, "prior": {"headline_total": 9, "headline_conv": 0, "res_total": 8, "res_conv": 0, "li_total": 1, "li_conv": 0, "nur_total": 1, "nur_conv": 0}}, "insights": {"cohort_eff": [{"m": "Jan", "new": 57, "sql": 20, "rate": 35.1}, {"m": "Feb", "new": 41, "sql": 25, "rate": 61.0}, {"m": "Mar", "new": 38, "sql": 16, "rate": 42.1}, {"m": "Apr", "new": 40, "sql": 22, "rate": 55.0}, {"m": "May", "new": 47, "sql": 31, "rate": 66.0}, {"m": "Jun", "new": 31, "sql": 22, "rate": 71.0}, {"m": "Jul", "new": 35, "sql": 12, "rate": 34.3}], "channel_quality": [{"channel": "Unattributed (No UTM)", "leads": 149, "sql": 108, "rate": 72, "avg_score": 166}, {"channel": "LinkedIn (Paid Social)", "leads": 98, "sql": 6, "rate": 6, "avg_score": 57}, {"channel": "Google Ads (Paid Search)", "leads": 26, "sql": 22, "rate": 85, "avg_score": 118}, {"channel": "Pardot Email", "leads": 9, "sql": 6, "rate": 67, "avg_score": 271}, {"channel": "AI Referral (ChatGPT)", "leads": 7, "sql": 6, "rate": 86, "avg_score": 183}], "lifetime": {"res_total": 77, "res_conv": 3, "li_total": 109, "li_conv": 0, "nur_total": 5, "nur_conv": 0, "examples": [{"email": "bella.chen@adlainortye.com", "first": "2026-04-09", "contact": "2026-04-09", "days": 0}, {"email": "rb@ghres.com", "first": "2026-03-02", "contact": "2026-03-18", "days": 16}, {"email": "vgv@lilly.com", "first": "2026-01-14", "contact": "2026-05-27", "days": 132}]}, "warm": {"total": 66, "top": [{"email": "francis.payumo@artbio.com", "score": 99.0, "first": "2026-01-14", "channel": "LinkedIn (Paid Social)"}, {"email": "jessica.bache.hansen@vicorepharma.com", "score": 99.0, "first": "2026-05-18", "channel": "Unattributed (No UTM)"}, {"email": "adiaz@alnylam.com", "score": 95.0, "first": "2025-12-15", "channel": "LinkedIn (Paid Social)"}, {"email": "sevgin.gunes@occlutech.com", "score": 95.0, "first": "2026-02-09", "channel": "Pardot Email"}, {"email": "tonynguyen@arsenalbio.com", "score": 92.0, "first": "2026-07-20", "channel": "Unattributed (No UTM)"}, {"email": "susana.schmitz@uni-rostock.de", "score": 91.0, "first": "2026-03-06", "channel": "Google Ads (Paid Search)"}, {"email": "liz.okeke@teleflex.com", "score": 88.0, "first": "2026-03-26", "channel": "LinkedIn (Paid Social)"}, {"email": "gmatias@vectorb2b.com", "score": 82.0, "first": "2026-04-08", "channel": "Unattributed (No UTM)"}, {"email": "nmalpartida@tech-res.com", "score": 81.0, "first": "2026-01-20", "channel": "Pardot Email"}, {"email": "liujuan@juventas.cn", "score": 78.0, "first": "2026-06-26", "channel": "Unattributed (No UTM)"}]}}, "product": {"sql_pages": {"top15": [["/ (homepage)", 27], ["/contact", 25], ["/CTMS", 8], ["/etmf-tmf-solutions", 7], ["(none recorded)", 7], ["/etmf-tmf-solutions/etmf", 6], ["/optimize-tmf-roadshow-2026", 5], ["/eArchive", 4], ["/eCTD-Submission-Solution", 3], ["/etmf-tmf-solutions/tmf-services", 2], ["/eclinical-platform", 2], ["/eClinical-platform-overview", 2], ["/request-a-demo", 2], ["/investigator-database", 2], ["/eISF", 2]], "rest_sum": 14, "rest_n": 14, "jun": {"/etmf-tmf-solutions": 5, "/ (homepage)": 5, "/etmf-tmf-solutions/etmf": 3, "/contact": 1, "/blog/what-your-monitoring-reports-are-already-telling-you-and-why-no-one-listening": 1, "/optimize-2026": 1, "/eISF": 1, "/CTMS": 1, "/eCTD-Submission-Solution": 1, "/blog/ctms-integration": 1}, "jul": {"/ (homepage)": 3, "/CTMS": 2, "/eArchive": 1, "/eCTD-Submission-Solution": 1, "/quality-management-system": 1, "/etmf-tmf-solutions/tmf-inspection-readiness/tmf-experts": 1, "/etmf-tmf-solutions/tmf-services": 1}, "rows": [{"page": "/ (homepage)", "prior": 5, "current": 3, "ytd": 26}, {"page": "/contact", "prior": 1, "current": 0, "ytd": 25}, {"page": "/CTMS", "prior": 1, "current": 2, "ytd": 8}, {"page": "/etmf-tmf-solutions", "prior": 5, "current": 0, "ytd": 7}, {"page": "(none recorded)", "prior": 0, "current": 0, "ytd": 7}, {"page": "/etmf-tmf-solutions/etmf", "prior": 3, "current": 0, "ytd": 6}, {"page": "/optimize-tmf-roadshow-2026", "prior": 0, "current": 0, "ytd": 5}, {"page": "/eArchive", "prior": 0, "current": 1, "ytd": 4}, {"page": "/eCTD-Submission-Solution", "prior": 1, "current": 1, "ytd": 3}, {"page": "/etmf-tmf-solutions/tmf-services", "prior": 0, "current": 1, "ytd": 2}, {"page": "/eclinical-platform", "prior": 0, "current": 0, "ytd": 2}, {"page": "/eClinical-platform-overview", "prior": 0, "current": 0, "ytd": 2}, {"page": "/request-a-demo", "prior": 0, "current": 0, "ytd": 2}, {"page": "/investigator-database", "prior": 0, "current": 0, "ytd": 2}, {"page": "/eISF", "prior": 1, "current": 0, "ytd": 2}]}, "assets": {"top15": [["ich-e6r3-tmf-oversight-best-practices-ensuring-compliance-and-quality", {"jun": {"n": 0, "mql": 0, "sql": 0}, "jul": {"n": 1, "mql": 1, "sql": 0}, "ytd": {"n": 10, "mql": 7, "sql": 3}}], ["understanding-risk-based-capa", {"jun": {"n": 0, "mql": 0, "sql": 0}, "jul": {"n": 1, "mql": 1, "sql": 0}, "ytd": {"n": 9, "mql": 7, "sql": 2}}], ["surfacing-your-ctms-and-etmf-using-ai", {"jun": {"n": 0, "mql": 0, "sql": 0}, "jul": {"n": 1, "mql": 0, "sql": 1}, "ytd": {"n": 7, "mql": 2, "sql": 5}}], ["data-interoperability-enablement-adopting-end-end-clinical-systems-apac", {"jun": {"n": 5, "mql": 3, "sql": 2}, "jul": {"n": 1, "mql": 1, "sql": 0}, "ytd": {"n": 6, "mql": 4, "sql": 2}}], ["etmf-implementation-checklist", {"jun": {"n": 0, "mql": 0, "sql": 0}, "jul": {"n": 2, "mql": 2, "sql": 0}, "ytd": {"n": 5, "mql": 4, "sql": 1}}], ["ai-clinical-operations-where-it-actually-saves-30-60-days-and-where-it-doesnt", {"jun": {"n": 2, "mql": 2, "sql": 0}, "jul": {"n": 0, "mql": 0, "sql": 0}, "ytd": {"n": 4, "mql": 3, "sql": 1}}], ["beyond-surface-level-ai-deep-inspection-etmf-records-quality-compliance-0", {"jun": {"n": 0, "mql": 0, "sql": 0}, "jul": {"n": 0, "mql": 0, "sql": 0}, "ytd": {"n": 4, "mql": 0, "sql": 4}}], ["tmf-rescue-checklist-gap-analysis-and-remediate-strategies", {"jun": {"n": 0, "mql": 0, "sql": 0}, "jul": {"n": 0, "mql": 0, "sql": 0}, "ytd": {"n": 4, "mql": 4, "sql": 0}}], ["etmf-migration-download", {"jun": {"n": 0, "mql": 0, "sql": 0}, "jul": {"n": 0, "mql": 0, "sql": 0}, "ytd": {"n": 3, "mql": 2, "sql": 1}}], ["20250721_tmfmockinspection_internal_quality_review_checklist_v1.01.pdf", {"jun": {"n": 0, "mql": 0, "sql": 0}, "jul": {"n": 0, "mql": 0, "sql": 0}, "ytd": {"n": 3, "mql": 1, "sql": 2}}], ["(no asset link)", {"jun": {"n": 0, "mql": 0, "sql": 0}, "jul": {"n": 1, "mql": 1, "sql": 0}, "ytd": {"n": 2, "mql": 1, "sql": 1}}], ["1010", {"jun": {"n": 0, "mql": 0, "sql": 0}, "jul": {"n": 0, "mql": 0, "sql": 0}, "ytd": {"n": 2, "mql": 2, "sql": 0}}], ["mhra-inspection-insights", {"jun": {"n": 0, "mql": 0, "sql": 0}, "jul": {"n": 0, "mql": 0, "sql": 0}, "ytd": {"n": 2, "mql": 1, "sql": 1}}], ["mhra-inspection-insights-part-2-metrics-matter", {"jun": {"n": 0, "mql": 0, "sql": 0}, "jul": {"n": 0, "mql": 0, "sql": 0}, "ytd": {"n": 2, "mql": 1, "sql": 1}}], ["three-pillars-of-quality-management", {"jun": {"n": 1, "mql": 1, "sql": 0}, "jul": {"n": 0, "mql": 0, "sql": 0}, "ytd": {"n": 2, "mql": 2, "sql": 0}}]], "rest_sum": 22, "rest_n": 20, "rows": [{"asset": "ich-e6r3-tmf-oversight-best-practices-ensuring-compliance-and-quality", "prior": {"n": 0, "mql": 0, "sql": 0}, "current": {"n": 1, "mql": 1, "sql": 0}, "ytd": {"n": 10, "mql": 7, "sql": 3}}, {"asset": "understanding-risk-based-capa", "prior": {"n": 0, "mql": 0, "sql": 0}, "current": {"n": 1, "mql": 1, "sql": 0}, "ytd": {"n": 9, "mql": 7, "sql": 2}}, {"asset": "surfacing-your-ctms-and-etmf-using-ai", "prior": {"n": 0, "mql": 0, "sql": 0}, "current": {"n": 1, "mql": 0, "sql": 1}, "ytd": {"n": 7, "mql": 2, "sql": 5}}, {"asset": "data-interoperability-enablement-adopting-end-end-clinical-systems-apac", "prior": {"n": 5, "mql": 3, "sql": 2}, "current": {"n": 1, "mql": 1, "sql": 0}, "ytd": {"n": 6, "mql": 4, "sql": 2}}, {"asset": "etmf-implementation-checklist", "prior": {"n": 0, "mql": 0, "sql": 0}, "current": {"n": 2, "mql": 2, "sql": 0}, "ytd": {"n": 5, "mql": 4, "sql": 1}}, {"asset": "ai-clinical-operations-where-it-actually-saves-30-60-days-and-where-it-doesnt", "prior": {"n": 2, "mql": 2, "sql": 0}, "current": {"n": 0, "mql": 0, "sql": 0}, "ytd": {"n": 4, "mql": 3, "sql": 1}}, {"asset": "beyond-surface-level-ai-deep-inspection-etmf-records-quality-compliance-0", "prior": {"n": 0, "mql": 0, "sql": 0}, "current": {"n": 0, "mql": 0, "sql": 0}, "ytd": {"n": 4, "mql": 0, "sql": 4}}, {"asset": "tmf-rescue-checklist-gap-analysis-and-remediate-strategies", "prior": {"n": 0, "mql": 0, "sql": 0}, "current": {"n": 0, "mql": 0, "sql": 0}, "ytd": {"n": 4, "mql": 4, "sql": 0}}, {"asset": "etmf-migration-download", "prior": {"n": 0, "mql": 0, "sql": 0}, "current": {"n": 0, "mql": 0, "sql": 0}, "ytd": {"n": 3, "mql": 2, "sql": 1}}, {"asset": "20250721_tmfmockinspection_internal_quality_review_checklist_v1.01.pdf", "prior": {"n": 0, "mql": 0, "sql": 0}, "current": {"n": 0, "mql": 0, "sql": 0}, "ytd": {"n": 3, "mql": 1, "sql": 2}}, {"asset": "(no asset link)", "prior": {"n": 0, "mql": 0, "sql": 0}, "current": {"n": 1, "mql": 1, "sql": 0}, "ytd": {"n": 2, "mql": 1, "sql": 1}}, {"asset": "1010", "prior": {"n": 0, "mql": 0, "sql": 0}, "current": {"n": 0, "mql": 0, "sql": 0}, "ytd": {"n": 2, "mql": 2, "sql": 0}}, {"asset": "mhra-inspection-insights", "prior": {"n": 0, "mql": 0, "sql": 0}, "current": {"n": 0, "mql": 0, "sql": 0}, "ytd": {"n": 2, "mql": 1, "sql": 1}}, {"asset": "mhra-inspection-insights-part-2-metrics-matter", "prior": {"n": 0, "mql": 0, "sql": 0}, "current": {"n": 0, "mql": 0, "sql": 0}, "ytd": {"n": 2, "mql": 1, "sql": 1}}, {"asset": "three-pillars-of-quality-management", "prior": {"n": 1, "mql": 1, "sql": 0}, "current": {"n": 0, "mql": 0, "sql": 0}, "ytd": {"n": 2, "mql": 2, "sql": 0}}]}}, "ytd_views": {"months": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul"], "service_sales_monthly": {"TI General": [0, 0, 1, 5, 2, 0, 3], "eClinical / multiple products": [7, 8, 7, 9, 10, 17, 0], "TMF": [1, 3, 2, 0, 3, 0, 1], "eTMF": [16, 22, 24, 12, 0, 3, 17], "CTMS": [0, 1, 0, 3, 1, 2, 2], "SSU": [1, 1, 0, 1, 0, 0, 0], "eISF": [1, 0, 0, 0, 0, 1, 1], "eArchive": [0, 0, 0, 0, 0, 0, 0], "LMS": [1, 1, 1, 0, 0, 0, 0], "AI / ML": [0, 0, 0, 0, 0, 0, 0], "Summits": [0, 0, 0, 0, 0, 0, 0], "Other": [1, 2, 0, 0, 14, 4, 0]}, "service_resource_monthly": {"TI General": [8, 6, 6, 1, 3, 2, 1], "eClinical / multiple products": [3, 1, 2, 0, 0, 5, 1], "TMF": [4, 2, 0, 11, 1, 0, 4], "eTMF": [1, 0, 3, 3, 1, 0, 2], "CTMS": [0, 0, 0, 1, 0, 0, 0], "SSU": [0, 0, 0, 2, 0, 0, 1], "eISF": [0, 0, 0, 0, 0, 0, 0], "eArchive": [0, 0, 0, 0, 0, 0, 0], "LMS": [0, 0, 0, 0, 0, 0, 1], "AI / ML": [0, 4, 0, 0, 2, 2, 2], "Summits": [0, 0, 0, 0, 0, 0, 0], "Other": [2, 0, 0, 0, 0, 0, 0]}, "eng_ytd": {"res_total": 77, "res_conv": 3, "li_total": 98, "li_conv": 0, "nur_total": 5, "nur_conv": 0, "headline_total": 175, "headline_conv": 3}, "chan_ytd": {"labels": ["Unattributed (No UTM)", "LinkedIn (Paid Social)", "Google Ads (Paid Search)", "Pardot Email", "AI Referral (ChatGPT)"], "values": [149, 98, 26, 9, 7], "colors": ["#003b71", "#ec388a", "#139dd8", "#3bbfb5", "#99cc33"]}}, "sql_100_149": [{"name": "Arantza Martin-Mateo", "email": "enzdk@leo-pharma.com", "company": "LEO Pharma", "score": 113.0, "path": "Score Qualified", "assigned_to": "enma.thompson@transperfect.com", "crm_status": "New", "unassigned": false}, {"name": "Bj\u00f6rn Dr. Silkenstedt", "email": "bjoern.silkenstedt@med.uni-muenchen.de", "company": "LMU Klinikum", "score": 101.0, "path": "Contact Form", "assigned_to": "claurie@transperfect.com", "crm_status": "Qualified", "unassigned": false}, {"name": "Julia Brahy", "email": "julia.brahy@avertomed.com", "company": "Averto Medical", "score": 101.0, "path": "Contact Form", "assigned_to": "denise.remick@transperfect.com", "crm_status": "Recycled", "unassigned": false}, {"name": "Charlie Kundig", "email": "ckundig@hopkinscoa.com", "company": "Hopkins Center of Acheivement, LLC.", "score": 100.0, "path": "Contact Form", "assigned_to": "tristan.devine@transperfect.com", "crm_status": "In Process", "unassigned": false}, {"name": "Dhaarmi Dhaarmi", "email": "dhaarmi@fidesregulatory.com", "company": "Fides Biocare", "score": 100.0, "path": "Contact Form", "assigned_to": "tristan.devine@transperfect.com", "crm_status": "In Process", "unassigned": false}, {"name": "Irha Khalid", "email": "ikhalid@rxconnect.ca", "company": "RxConnect", "score": 100.0, "path": "Contact Form", "assigned_to": "tristan.devine@transperfect.com", "crm_status": "In Process", "unassigned": false}, {"name": "Jaeyoung Choi", "email": "jaeyoung@silviahealth.com", "company": "Silvia Health", "score": 100.0, "path": "Contact Form", "assigned_to": "wdu@transperfect.com", "crm_status": "New", "unassigned": false}]};
 const CUR = D.meta.current, PRIOR = D.meta.prior;
-const C = {darkBlue:'#003b71',lightBlue:'#139dd8',lightBlue2:'#4199d8',teal:'#3bbfb5',lime:'#99cc33',magenta:'#ec388a',cream:'#e7e3da',lbgray:'#e0e8f5'};
+const C = {darkBlue:'#003b71',lightBlue:'#139dd8',lightBlue2:'#4199d8',teal:'#3bbfb5',blastTeal:'#7fd4cd',lime:'#99cc33',magenta:'#ec388a',cream:'#e7e3da',lbgray:'#e0e8f5'};
 Chart.defaults.font.family='Arial, Helvetica, sans-serif';
 Chart.defaults.color='#475569';
 Chart.defaults.plugins.legend.labels.boxWidth=12;
@@ -370,105 +266,71 @@ function svc(id, sl, color){
       scales:{x:{beginAtZero:true,grid:{color:'#eef1f5'},ticks:{precision:0}},y:{grid:{display:false}}},
       plugins:{legend:{display:false}}}});
 }
-svc('salesSvc', D.service.sales, C.teal);
-svc('resSvc', D.service.resource, C.magenta);
+svc('salesServiceLineChart', D.service.sales, C.teal);
+svc('resourceServiceLineChart', D.service.resource, C.magenta);
 
-// Donut
-new Chart(document.getElementById('donut'),{type:'doughnut',
+// Channel donut
+new Chart(document.getElementById('channelDonutChart'),{type:'doughnut',
   data:{labels:D.donut.labels,datasets:[{data:D.donut.values,backgroundColor:D.donut.colors,borderWidth:2,borderColor:'#fff'}]},
   options:{responsive:true,maintainAspectRatio:false,cutout:'62%',
     plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10.5}}}}}});
 
-// Trend helper
-function trend(id, series){
-  const labels=D.trend.labels;
-  const bg=labels.map((_,i)=> i===labels.length-1 ? C.magenta : C.lbgray);
-  new Chart(document.getElementById(id),{type:'bar',
-    data:{labels,datasets:[{data:series,backgroundColor:bg,borderRadius:5,maxBarThickness:44}]},
-    options:{responsive:true,maintainAspectRatio:false,
-      scales:{y:{beginAtZero:true,grid:{color:'#eef1f5'},ticks:{precision:0}},x:{grid:{display:false}}},
-      plugins:{legend:{display:false}}}});
-}
-trend('trendTotal', D.trend.total);
-trend('trendGads', D.trend.gads);
-trend('trendLi', D.trend.li);
+// 7-month total trend
+new Chart(document.getElementById('trendChart'),{type:'bar',
+  data:{labels:D.trend.labels,datasets:[{data:D.trend.total,
+    backgroundColor:D.trend.labels.map((_,i)=> i===D.trend.labels.length-1 ? C.magenta : C.lbgray),
+    borderRadius:5,maxBarThickness:40}]},
+  options:{responsive:true,maintainAspectRatio:false,
+    scales:{y:{beginAtZero:true,grid:{color:'#eef1f5'}},x:{grid:{display:false}}},
+    plugins:{legend:{display:false}}}});
 
-// S8 stacked
-new Chart(document.getElementById('s8chart'),{type:'bar',
+// Google Ads trend
+new Chart(document.getElementById('googleTrendChart'),{type:'bar',
+  data:{labels:D.trend.labels,datasets:[{data:D.trend.gads,
+    backgroundColor:D.trend.labels.map((_,i)=> i===D.trend.labels.length-1 ? C.magenta : C.lbgray),
+    borderRadius:5,maxBarThickness:36}]},
+  options:{responsive:true,maintainAspectRatio:false,
+    scales:{y:{beginAtZero:true,grid:{color:'#eef1f5'},ticks:{precision:0}},x:{grid:{display:false}}},
+    plugins:{legend:{display:false}}}});
+
+// LinkedIn trend
+new Chart(document.getElementById('linkedinTrendChart'),{type:'bar',
+  data:{labels:D.trend.labels,datasets:[{data:D.trend.li,
+    backgroundColor:D.trend.labels.map((_,i)=> i===D.trend.labels.length-1 ? C.magenta : C.lbgray),
+    borderRadius:5,maxBarThickness:36}]},
+  options:{responsive:true,maintainAspectRatio:false,
+    scales:{y:{beginAtZero:true,grid:{color:'#eef1f5'}},x:{grid:{display:false}}},
+    plugins:{legend:{display:false}}}});
+
+// Email Nurture vs Blast trend
+new Chart(document.getElementById('emailTrendChart'),{type:'bar',
+  data:{labels:D.trend.labels,datasets:[
+    {label:'Nurture',data:D.trend.nurture,backgroundColor:C.teal,stack:'s'},
+    {label:'Blast',data:D.trend.blast,backgroundColor:C.blastTeal,stack:'s'}]},
+  options:{responsive:true,maintainAspectRatio:false,
+    scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,beginAtZero:true,grid:{color:'#eef1f5'},ticks:{precision:0}}},
+    plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10}}}}}});
+
+// What Channels Drove the Leads (stacked, merged MQL+SQL+Unscored)
+new Chart(document.getElementById('channelFunnelChart'),{type:'bar',
   data:{labels:D.s8.labels,datasets:[
     {label:'MQL',data:D.s8.mql,backgroundColor:C.lightBlue,stack:'s'},
-    {label:'SQL – Contact Form',data:D.s8.cf,backgroundColor:C.teal,stack:'s'},
-    {label:'SQL – Score Qualified',data:D.s8.sq,backgroundColor:C.magenta,stack:'s'}]},
+    {label:'SQL - Contact Form Fill',data:D.s8.cf,backgroundColor:C.teal,stack:'s'},
+    {label:'SQL - Score Qualified',data:D.s8.sq,backgroundColor:C.magenta,stack:'s'},
+    {label:'Unscored (pending sync)',data:D.s8.unscored||D.s8.labels.map(()=>0),backgroundColor:'#c7ccd4',stack:'s'}]},
   options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
     scales:{x:{stacked:true,beginAtZero:true,grid:{color:'#eef1f5'},ticks:{precision:0}},y:{stacked:true,grid:{display:false}}},
     plugins:{legend:{position:'bottom'}}}});
 
-// S9 MQL by channel
-new Chart(document.getElementById('s9chart'),{type:'bar',
-  data:{labels:D.s9.labels,datasets:[{data:D.s9.values,backgroundColor:D.s9.colors,borderRadius:5,maxBarThickness:34}]},
-  options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
-    scales:{x:{beginAtZero:true,grid:{color:'#eef1f5'},ticks:{precision:0}},y:{grid:{display:false}}},
-    plugins:{legend:{display:false}}}});
-
-// Score dist
+// Score distribution
 const sl=D.score.labels;
-new Chart(document.getElementById('scoreChart'),{type:'bar',
+new Chart(document.getElementById('scoreDistChart'),{type:'bar',
   data:{labels:sl,datasets:[{data:D.score.values,
     backgroundColor:sl.map(x=> x==='No Score' ? '#c7ccd4' : (parseInt(x)>=100 ? C.magenta : C.lightBlue)),
     borderRadius:5,maxBarThickness:52}]},
   options:{responsive:true,maintainAspectRatio:false,
     scales:{y:{beginAtZero:true,grid:{color:'#eef1f5'},ticks:{precision:0}},x:{grid:{display:false}}},
     plugins:{legend:{display:false}}}});
-
-// ===== Deeper insights =====
-const INS = D.insights;
-
-// 11: cohort quality combo chart (bars = new leads, line = SQL rate)
-new Chart(document.getElementById('cohortChart'),{type:'bar',
-  data:{labels:INS.cohort_eff.map(r=>r.m),datasets:[
-    {type:'bar',label:'New Leads',data:INS.cohort_eff.map(r=>r.new),backgroundColor:C.lbgray,borderRadius:5,maxBarThickness:44,yAxisID:'y'},
-    {type:'bar',label:'SQL',data:INS.cohort_eff.map(r=>r.sql),backgroundColor:C.lightBlue,borderRadius:5,maxBarThickness:44,yAxisID:'y'},
-    {type:'line',label:'SQL Rate %',data:INS.cohort_eff.map(r=>r.rate),borderColor:C.magenta,backgroundColor:C.magenta,tension:.3,pointRadius:4,yAxisID:'y2'}
-  ]},
-  options:{responsive:true,maintainAspectRatio:false,
-    scales:{y:{beginAtZero:true,grid:{color:'#eef1f5'},ticks:{precision:0},title:{display:true,text:'Leads'}},
-      y2:{beginAtZero:true,max:100,position:'right',grid:{display:false},title:{display:true,text:'SQL Rate %'}},
-      x:{grid:{display:false}}},
-    plugins:{legend:{position:'bottom'}}}});
-
-// 16: YTD views
-(function(){
-  const Y=D.ytd_views;
-  const PALETTE=['#003b71','#139dd8','#4199d8','#3bbfb5','#99cc33','#ec388a','#5a7fa8','#e7a33b','#8e6bb0','#c0562f','#7a8ba0','#444444'];
-  function stacked(id, tbl){
-    const lines=Object.keys(tbl).filter(k=>tbl[k].some(v=>v>0));
-    new Chart(document.getElementById(id),{type:'bar',
-      data:{labels:Y.months,datasets:lines.map((k,i)=>({label:k,data:tbl[k],backgroundColor:PALETTE[i%PALETTE.length],stack:'s',borderRadius:2,maxBarThickness:44}))},
-      options:{responsive:true,maintainAspectRatio:false,
-        scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,beginAtZero:true,grid:{color:'#eef1f5'},ticks:{precision:0}}},
-        plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10}}}}}});
-  }
-  stacked('svcSalesMonthly', Y.service_sales_monthly);
-  stacked('svcResMonthly', Y.service_resource_monthly);
-
-  const names = Y.chan_ytd.labels;
-  new Chart(document.getElementById('ytdDonut'),{type:'doughnut',
-    data:{labels:names,datasets:[{data:Y.chan_ytd.values,backgroundColor:Y.chan_ytd.colors,borderWidth:2,borderColor:'#fff'}]},
-    options:{responsive:true,maintainAspectRatio:false,cutout:'62%',
-      plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10.5}}}}}});
-
-  const ytdTot = Y.chan_ytd.values.reduce((a,b)=>a+b,0);
-  const curMap = {}; D.donut.labels.forEach((l,i)=>curMap[l]=D.donut.values[i]);
-  const curTot = D.donut.values.reduce((a,b)=>a+b,0);
-  const ytdMap = {}; names.forEach((n,i)=>ytdMap[n]=Y.chan_ytd.values[i]);
-  new Chart(document.getElementById('ytdMixCompare'),{type:'bar',
-    data:{labels:names,datasets:[
-      {label:CUR+' %',data:names.map(n=>+(100*(curMap[n]||0)/curTot).toFixed(1)),backgroundColor:'#ec388a',borderRadius:4,maxBarThickness:20},
-      {label:'YTD %',data:names.map(n=>+(100*(ytdMap[n]||0)/ytdTot).toFixed(1)),backgroundColor:'#e0e8f5',borderRadius:4,maxBarThickness:20}]},
-    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
-      scales:{x:{beginAtZero:true,grid:{color:'#eef1f5'},ticks:{callback:v=>v+'%'}},y:{grid:{display:false},ticks:{font:{size:10}}}},
-      plugins:{legend:{position:'bottom'}}}});
-})();
 
 </script>
 </body>
